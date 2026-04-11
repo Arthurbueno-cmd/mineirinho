@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.pyo
+*.db
+*.log
+.env
+caixa_postal_banco/
+processados/
+relatorios_triade/
+erros/
+venv/
+.venv/

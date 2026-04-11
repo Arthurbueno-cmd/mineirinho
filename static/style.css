@@ -1,0 +1,504 @@
+:root {
+  /* --- Paleta principal: Azul corporativo + Cinza estrutural --- */
+  --color-brand-900:   #0A1628;   /* fundo escuro / header */
+  --color-brand-800:   #0F2040;   /* painéis laterais */
+  --color-brand-700:   #163360;   /* hover em dark */
+  --color-brand-600:   #1E4D8C;   /* borda de destaque */
+  --color-brand-500:   #2563B0;   /* cor primária de ação */
+  --color-brand-400:   #3B82D0;   /* hover de botão primário */
+  --color-brand-300:   #6BAAE8;   /* ícones e labels informativos */
+  --color-brand-200:   #AECEF4;   /* backgrounds informativos suaves */
+  --color-brand-100:   #D6E8FA;   /* badges / chips */
+  --color-brand-50:    #EFF6FD;   /* fundo de seção muito suave */
+
+  /* --- Cinza neutro --- */
+  --color-gray-950:    #0D0D0F;
+  --color-gray-900:    #18181C;
+  --color-gray-800:    #26262D;
+  --color-gray-700:    #38383F;
+  --color-gray-600:    #52525A;
+  --color-gray-500:    #71717A;
+  --color-gray-400:    #A0A0AB;
+  --color-gray-300:    #C4C4CC;
+  --color-gray-200:    #E0E0E6;
+  --color-gray-100:    #F1F1F5;
+  --color-gray-50:     #F8F8FB;
+
+  /* --- Semânticas --- */
+  --color-success:     #16A34A;
+  --color-success-bg:  #DCFCE7;
+  --color-warning:     #CA8A04;
+  --color-warning-bg:  #FEF9C3;
+  --color-danger:      #DC2626;
+  --color-danger-bg:   #FEE2E2;
+  --color-info:        var(--color-brand-500);
+  --color-info-bg:     var(--color-brand-50);
+
+  /* --- Tipografia --- */
+  --font-sans:  'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+  --font-mono:  'IBM Plex Mono', 'Fira Code', 'Cascadia Code', monospace;
+  --font-size-xs:   11px;
+  --font-size-sm:   13px;
+  --font-size-md:   15px;
+  --font-size-lg:   18px;
+  --font-size-xl:   22px;
+  --font-size-2xl:  28px;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --line-height-body: 1.65;
+
+  /* --- Espaçamento --- */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* --- Bordas e sombras --- */
+  --radius-sm:  4px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+  --radius-xl:  16px;
+  --border-default: 0.5px solid var(--color-gray-200);
+  --border-focus:   1.5px solid var(--color-brand-500);
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md:  0 4px 12px rgba(0,0,0,0.10);
+  --shadow-lg:  0 8px 24px rgba(0,0,0,0.12);
+
+  /* --- Transições --- */
+  --transition-fast:   120ms ease;
+  --transition-normal: 220ms ease;
+}
+
+/* --- Modo escuro automático --- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-brand-50:  #0F2040;
+    --color-brand-100: #163360;
+    --color-brand-200: #1E4D8C;
+    --color-gray-50:   #18181C;
+    --color-gray-100:  #26262D;
+    --color-gray-200:  #38383F;
+    --color-gray-300:  #52525A;
+    --border-default:  0.5px solid var(--color-gray-700);
+    --shadow-sm:  0 1px 3px rgba(0,0,0,0.30);
+    --shadow-md:  0 4px 12px rgba(0,0,0,0.40);
+  }
+}
+
+
+/* ============================================================
+   2. RESET MÍNIMO
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-body);
+  color: var(--color-gray-900);
+  background: var(--color-gray-50);
+  -webkit-font-smoothing: antialiased;
+}
+
+img, svg { display: block; max-width: 100%; }
+a { color: var(--color-brand-500); text-decoration: none; }
+a:hover { color: var(--color-brand-400); text-decoration: underline; }
+code, pre { font-family: var(--font-mono); font-size: var(--font-size-sm); }
+
+
+/* ============================================================
+   3. LAYOUT BASE
+   ============================================================ */
+
+/* Wrapper principal da aplicação */
+.app-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  grid-template-rows: 56px 1fr;
+  min-height: 100vh;
+}
+
+/* Header */
+.app-header {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 0 var(--space-6);
+  background: var(--color-brand-900);
+  border-bottom: 0.5px solid var(--color-brand-700);
+}
+
+.app-header .logo {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-brand-200);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.app-header .status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-success);
+  margin-left: auto;
+}
+
+.app-header .status-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-400);
+}
+
+/* Sidebar */
+.app-sidebar {
+  background: var(--color-brand-800);
+  padding: var(--space-6) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  border-right: 0.5px solid var(--color-brand-700);
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-brand-300);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.sidebar-item:hover   { background: var(--color-brand-700); color: #fff; }
+.sidebar-item.active  { background: var(--color-brand-600); color: #fff; font-weight: var(--font-weight-medium); }
+
+.sidebar-section-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-brand-400);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: var(--space-5) var(--space-3) var(--space-2);
+}
+
+/* Conteúdo principal */
+.app-main {
+  padding: var(--space-8);
+  overflow-y: auto;
+}
+
+
+/* ============================================================
+   4. COMPONENTES
+   ============================================================ */
+
+/* --- Cards --- */
+.card {
+  background: #fff;
+  border: var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-4);
+  border-bottom: var(--border-default);
+}
+
+.card-title {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+}
+
+/* --- Metric cards (KPIs no topo do dashboard) --- */
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-4);
+}
+
+.metric-card {
+  background: var(--color-gray-50);
+  border: var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+}
+
+.metric-card__label {
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: var(--space-1);
+}
+
+.metric-card__value {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.2;
+}
+
+.metric-card__value.--success { color: var(--color-success); }
+.metric-card__value.--warning { color: var(--color-warning); }
+.metric-card__value.--danger  { color: var(--color-danger);  }
+.metric-card__value.--brand   { color: var(--color-brand-500); }
+
+/* --- Badges / Status --- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  line-height: 1.4;
+}
+
+.badge--ok      { background: var(--color-success-bg); color: var(--color-success); }
+.badge--diverge { background: var(--color-danger-bg);  color: var(--color-danger);  }
+.badge--warn    { background: var(--color-warning-bg); color: var(--color-warning); }
+.badge--info    { background: var(--color-brand-100);  color: var(--color-brand-600); }
+
+/* --- Tabela de conciliação --- */
+.reconcile-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.reconcile-table thead th {
+  text-align: left;
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: var(--border-default);
+  background: var(--color-gray-50);
+}
+
+.reconcile-table tbody tr {
+  border-bottom: var(--border-default);
+  transition: background var(--transition-fast);
+}
+
+.reconcile-table tbody tr:hover { background: var(--color-brand-50); }
+
+.reconcile-table tbody td {
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-gray-700);
+}
+
+.reconcile-table .col-value   { font-family: var(--font-mono); text-align: right; }
+.reconcile-table .col-status  { text-align: center; }
+
+/* --- Botões --- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  border: 0.5px solid transparent;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.btn--primary {
+  background: var(--color-brand-500);
+  color: #fff;
+  border-color: var(--color-brand-600);
+}
+.btn--primary:hover { background: var(--color-brand-400); }
+
+.btn--secondary {
+  background: #fff;
+  color: var(--color-gray-700);
+  border-color: var(--color-gray-300);
+}
+.btn--secondary:hover { background: var(--color-gray-100); }
+
+.btn--danger {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+.btn--danger:hover { background: var(--color-danger); color: #fff; }
+
+/* --- Formulários --- */
+.form-group { display: flex; flex-direction: column; gap: var(--space-1); }
+
+.form-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-700);
+}
+
+.form-input {
+  height: 36px;
+  padding: 0 var(--space-3);
+  border: 0.5px solid var(--color-gray-300);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-family: var(--font-sans);
+  color: var(--color-gray-900);
+  background: #fff;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-input:focus {
+  outline: none;
+  border: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(37, 99, 176, 0.12);
+}
+
+/* --- Toast / Notificações --- */
+.toast {
+  position: fixed;
+  bottom: var(--space-6);
+  right: var(--space-6);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  box-shadow: var(--shadow-md);
+  animation: slideIn var(--transition-normal) ease;
+}
+
+.toast--success { background: var(--color-success-bg); color: var(--color-success); }
+.toast--error   { background: var(--color-danger-bg);  color: var(--color-danger);  }
+
+@keyframes slideIn {
+  from { transform: translateY(12px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* --- Drop zone (upload de arquivo) --- */
+.drop-zone {
+  border: 1.5px dashed var(--color-brand-300);
+  border-radius: var(--radius-lg);
+  padding: var(--space-10) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--color-brand-50);
+  color: var(--color-gray-500);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.drop-zone:hover,
+.drop-zone.--active {
+  background: var(--color-brand-100);
+  border-color: var(--color-brand-500);
+  color: var(--color-brand-600);
+}
+
+/* --- Log / Terminal embed --- */
+.log-viewer {
+  background: var(--color-gray-950);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-300);
+  overflow-y: auto;
+  max-height: 320px;
+  line-height: 1.8;
+}
+
+.log-viewer .log-ok      { color: #4ADE80; }   /* verde terminal */
+.log-viewer .log-warn    { color: #FACC15; }   /* amarelo terminal */
+.log-viewer .log-error   { color: #F87171; }   /* vermelho terminal */
+.log-viewer .log-info    { color: #60A5FA; }   /* azul terminal */
+.log-viewer .log-muted   { color: var(--color-gray-600); }
+
+/* --- Progressbar --- */
+.progress-bar {
+  height: 6px;
+  background: var(--color-gray-200);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progress-bar__fill {
+  height: 100%;
+  border-radius: 99px;
+  background: var(--color-brand-500);
+  transition: width 400ms ease;
+}
+
+
+/* ============================================================
+   5. UTILITÁRIOS
+   ============================================================ */
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+.text-mono  { font-family: var(--font-mono); }
+.text-muted { color: var(--color-gray-500); }
+.text-sm    { font-size: var(--font-size-sm); }
+.text-xs    { font-size: var(--font-size-xs); }
+.text-right { text-align: right; }
+.truncate   { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.flex       { display: flex; }
+.flex-col   { flex-direction: column; }
+.items-center { align-items: center; }
+.gap-2      { gap: var(--space-2); }
+.gap-4      { gap: var(--space-4); }
+.gap-6      { gap: var(--space-6); }
+
+.mt-4  { margin-top: var(--space-4); }
+.mt-6  { margin-top: var(--space-6); }
+.mb-4  { margin-bottom: var(--space-4); }
+.mb-6  { margin-bottom: var(--space-6); }
+
+
+/* ============================================================
+   6. MAPEAMENTO RICH → CSS
+   Referência para manter consistência entre terminal e web
+   ============================================================ */
+/*
+  TERMINAL (Rich)         WEB (CSS)
+  ─────────────────────────────────────────────────────────────
+  bold yellow             .logo / headings
+  blue (border)           --color-brand-500 / --color-brand-600
+  bold cyan (progress)    --color-brand-300
+  green  (OK)             --color-success / .badge--ok
+  red    (DIVERGENTE)     --color-danger  / .badge--diverge
+  dim    (aguardando)     .text-muted
+  bold green (ONLINE)     .status-dot + --color-success
+  red    (OFFLINE/erro)   --color-danger
+  white  (valores)        --color-gray-900
+*/
+
+
+/* ============================================================
+   FIM DO ARQUIVO
+   Próximos componentes a adicionar conforme evolução:
+   - Dashboard de KPIs (seção 7)
+   - Filtros e paginação da tabela (seção 8)
+   - Modal de detalhes de divergência (seção 9)
+   - Autenticação web (seção 10)
+   ============================================================ */

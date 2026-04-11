@@ -1,0 +1,6 @@
+flask
+gunicorn
+pandas
+openpyxl
+xlrd
+werkzeug
