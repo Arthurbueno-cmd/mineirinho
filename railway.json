@@ -1,5 +1,8 @@
 {
+  "build": {
+    "buildCommand": "pip install -r requirements.txt"
+  },
   "deploy": {
-    "startCommand": "python -m gunicorn app:app"
+    "startCommand": "gunicorn app:app"
   }
 }
