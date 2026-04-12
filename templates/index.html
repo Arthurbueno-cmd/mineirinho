@@ -13,19 +13,32 @@
 
 <!-- LOGIN -->
 <div id="tela-login">
-  <div class="login-card">
-    <div class="login-logo">⛏ MINEIRINHO V3.0</div>
-    <p class="login-sub">Conciliação Financeira Inteligente</p>
-    <div class="form-group">
-      <label class="form-label">Usuário</label>
-      <input class="form-input" id="input-usuario" type="text" placeholder="seu usuário" />
+  <div class="login-left">
+    <div class="login-brand">
+      <div class="login-brand__icon">⛏</div>
+      <span class="login-brand__name">Mineirinho V3.0</span>
     </div>
-    <div class="form-group" style="margin-top:12px;">
-      <label class="form-label">Senha</label>
-      <input class="form-input" id="input-senha" type="password" placeholder="••••••••" />
+    <div class="login-hero">
+      <h1 class="login-hero__title">Conciliação<br><span>financeira</span><br>inteligente.</h1>
+      <p class="login-hero__sub">Processe extratos bancários e relatórios de condomínios com análise automática de IA.</p>
     </div>
-    <p id="erro-login" class="erro-msg" style="display:none;"></p>
-    <button class="btn btn--primary btn--full" id="btn-login" style="margin-top:20px;">Entrar</button>
+    <div class="login-dots"><span></span><span></span><span></span></div>
+  </div>
+  <div class="login-right">
+    <div class="login-card">
+      <div class="login-logo">Bem-vindo 👋</div>
+      <p class="login-sub">Entre com suas credenciais para continuar</p>
+      <div class="form-group">
+        <label class="form-label">Usuário</label>
+        <input class="form-input" id="input-usuario" type="text" placeholder="seu usuário" />
+      </div>
+      <div class="form-group" style="margin-top:16px;">
+        <label class="form-label">Senha</label>
+        <input class="form-input" id="input-senha" type="password" placeholder="••••••••" />
+      </div>
+      <p id="erro-login" class="erro-msg" style="display:none;"></p>
+      <button class="btn btn--primary btn--full" id="btn-login" style="margin-top:24px;height:46px;font-size:14px;">Entrar →</button>
+    </div>
   </div>
 </div>
 
