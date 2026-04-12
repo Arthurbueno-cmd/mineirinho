@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Assistente Mineirinho V3.0</title>
+  <title>Mineirinho V3.0</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet" />
@@ -11,410 +11,556 @@
 </head>
 <body>
 
-  <!-- TELA DE LOGIN -->
-  <div id="tela-login" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--color-brand-900);">
-    <div class="card" style="width:360px;">
-      <div class="card-header" style="justify-content:center;flex-direction:column;align-items:center;gap:8px;">
-        <span class="logo" style="font-family:var(--font-mono);font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);color:var(--color-brand-500);letter-spacing:0.08em;text-transform:uppercase;">⛏ MINEIRINHO V3.0</span>
-        <p class="text-muted text-sm">Faça login para continuar</p>
+<!-- ══════════════════════════════════════════════
+     TELA DE LOGIN
+══════════════════════════════════════════════ -->
+<div id="tela-login">
+  <div class="login-card">
+    <div class="login-logo">⛏ MINEIRINHO V3.0</div>
+    <p class="login-sub">Conciliação Financeira Inteligente</p>
+    <div class="form-group">
+      <label class="form-label">Usuário</label>
+      <input class="form-input" id="input-usuario" type="text" placeholder="arthur" />
+    </div>
+    <div class="form-group" style="margin-top:12px;">
+      <label class="form-label">Senha</label>
+      <input class="form-input" id="input-senha" type="password" placeholder="••••••••" />
+    </div>
+    <p id="erro-login" class="erro-msg" style="display:none;"></p>
+    <button class="btn btn--primary btn--full" id="btn-login" style="margin-top:20px;">Entrar</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     APP PRINCIPAL
+══════════════════════════════════════════════ -->
+<div id="tela-app" class="app-layout" style="display:none;">
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <span class="logo">⛏ Mineirinho V3.0</span>
+    <nav class="header-nav">
+      <button class="btn-nav active" data-section="lotes">Lotes</button>
+      <button class="btn-nav" data-section="logs">Logs</button>
+    </nav>
+    <div class="header-right">
+      <div class="status-dot"></div>
+      <span class="status-label">Online</span>
+      <span style="color:#52525A;">|</span>
+      <span id="nome-usuario" class="usuario-label"></span>
+      <button class="btn btn--ghost" id="btn-logout">Sair</button>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside class="app-sidebar">
+    <span class="sidebar-section-label">Menu</span>
+    <div class="sidebar-item active" data-section="lotes">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>
+      Lotes
+    </div>
+    <div class="sidebar-item" data-section="logs">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Log do Motor
+    </div>
+    <span class="sidebar-section-label" style="margin-top:auto;">Sistema</span>
+    <div class="sidebar-item" id="sidebar-logout">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3H3a1 1 0 00-1 1v8a1 1 0 001 1h3M10 11l3-3-3-3M13 8H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Sair
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="app-main">
+
+    <!-- ── SEÇÃO: LOTES ── -->
+    <section id="section-lotes">
+      <div class="section-header">
+        <div>
+          <h1 class="section-title">Lotes de Conciliação</h1>
+          <p class="section-sub">Agrupe vários condomínios e processe tudo de uma vez com IA</p>
+        </div>
+        <button class="btn btn--primary" id="btn-novo-lote">+ Novo Lote</button>
       </div>
-      <div style="display:flex;flex-direction:column;gap:var(--space-4);">
-        <div class="form-group">
-          <label class="form-label" for="input-usuario">Usuário</label>
-          <input class="form-input" id="input-usuario" type="text" placeholder="arthur" autocomplete="username" />
+
+      <!-- Lista de lotes -->
+      <div id="lotes-vazio" class="empty-state">
+        <div class="empty-icon">📂</div>
+        <p>Nenhum lote criado ainda.</p>
+        <p class="text-muted text-sm">Clique em "Novo Lote" para começar.</p>
+      </div>
+      <div id="lotes-lista"></div>
+    </section>
+
+    <!-- ── SEÇÃO: LOGS ── -->
+    <section id="section-logs" style="display:none;">
+      <div class="section-header">
+        <div>
+          <h1 class="section-title">Log do Motor</h1>
+          <p class="section-sub">Eventos do sistema em tempo real</p>
         </div>
-        <div class="form-group">
-          <label class="form-label" for="input-senha">Senha</label>
-          <input class="form-input" id="input-senha" type="password" placeholder="••••••••" autocomplete="current-password" />
-        </div>
-        <p id="erro-login" style="display:none;font-size:var(--font-size-xs);color:var(--color-danger);margin-top:calc(-1 * var(--space-2));"></p>
-        <button class="btn btn--primary" id="btn-login" style="width:100%;justify-content:center;">Entrar</button>
+        <button class="btn btn--secondary" id="btn-atualizar-log">Atualizar</button>
+      </div>
+      <div class="card">
+        <div class="log-viewer" id="log-viewer"><span class="log-muted">· carregando...</span></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     MODAL: NOVO LOTE
+══════════════════════════════════════════════ -->
+<div id="modal-overlay" class="modal-overlay" style="display:none;">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">⛏ Novo Lote de Conciliação</span>
+      <button class="modal-close" id="btn-fechar-modal">✕</button>
+    </div>
+
+    <!-- PASSO 1: Nome do lote -->
+    <div id="modal-passo1">
+      <p class="modal-desc">Dê um nome para identificar este lote (ex: "Fechamento Abril 2026")</p>
+      <div class="form-group">
+        <label class="form-label">Nome do Lote</label>
+        <input class="form-input" id="input-nome-lote" type="text" placeholder="Fechamento Abril 2026" />
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn--secondary" id="btn-cancelar-lote">Cancelar</button>
+        <button class="btn btn--primary" id="btn-criar-lote">Criar Lote →</button>
+      </div>
+    </div>
+
+    <!-- PASSO 2: Adicionar condomínios -->
+    <div id="modal-passo2" style="display:none;">
+      <p class="modal-desc">Adicione os condomínios e envie os arquivos de cada um</p>
+
+      <div id="condominios-lista-modal"></div>
+
+      <button class="btn btn--secondary btn--full" id="btn-add-condominio" style="margin-top:12px;">
+        + Adicionar Condomínio
+      </button>
+
+      <div class="modal-footer" style="margin-top:20px;">
+        <button class="btn btn--secondary" id="btn-cancelar-lote2">Cancelar</button>
+        <button class="btn btn--primary" id="btn-processar-lote">⛏ Processar com IA</button>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- APP PRINCIPAL -->
-  <div id="tela-app" class="app-layout" style="display:none;">
+<!-- ══════════════════════════════════════════════
+     MODAL: RESULTADO CONDOMÍNIO
+══════════════════════════════════════════════ -->
+<div id="modal-resultado-overlay" class="modal-overlay" style="display:none;">
+  <div class="modal modal--lg">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-resultado-titulo">Resultado</span>
+      <button class="modal-close" id="btn-fechar-resultado">✕</button>
+    </div>
 
-    <header class="app-header">
-      <span class="logo">⛏ Mineirinho V3.0</span>
-      <nav style="display:flex;gap:var(--space-2);margin-left:var(--space-8);">
-        <button class="btn btn--secondary btn-nav active" data-section="dashboard">Dashboard</button>
-        <button class="btn btn--secondary btn-nav" data-section="upload">Upload</button>
-        <button class="btn btn--secondary btn-nav" data-section="resultados">Resultados</button>
-        <button class="btn btn--secondary btn-nav" data-section="logs">Logs</button>
-      </nav>
-      <div style="margin-left:auto;display:flex;align-items:center;gap:var(--space-3);">
-        <div class="status-dot"></div>
-        <span class="status-label">Online</span>
-        <span class="text-muted text-sm">|</span>
-        <span class="text-sm" id="nome-usuario" style="color:var(--color-brand-300);"></span>
-        <button class="btn btn--secondary" id="btn-logout" style="padding:4px 10px;font-size:var(--font-size-xs);">Sair</button>
-      </div>
-    </header>
+    <!-- Análise IA -->
+    <div class="ia-box">
+      <div class="ia-box__header">🤖 Análise da IA</div>
+      <div class="ia-box__content" id="modal-analise-ia"></div>
+    </div>
 
-    <aside class="app-sidebar">
-      <span class="sidebar-section-label">Menu</span>
-      <div class="sidebar-item active" data-section="dashboard">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>
-        Dashboard
-      </div>
-      <div class="sidebar-item" data-section="upload">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1v9M5 4l3-3 3 3M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Upload de Arquivo
-      </div>
-      <div class="sidebar-item" data-section="resultados">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M1 6h14" stroke="currentColor" stroke-width="1.5"/><path d="M5 10h2M9 10h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        Resultados
-      </div>
-      <div class="sidebar-item" data-section="logs">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        Log do Motor
-      </div>
-      <span class="sidebar-section-label" style="margin-top:auto;">Sistema</span>
-      <div class="sidebar-item" id="sidebar-logout">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3H3a1 1 0 00-1 1v8a1 1 0 001 1h3M10 11l3-3-3-3M13 8H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Sair
-      </div>
-    </aside>
-
-    <main class="app-main">
-
-      <!-- DASHBOARD -->
-      <section id="section-dashboard">
-        <h1 style="font-size:var(--font-size-xl);font-weight:var(--font-weight-medium);margin-bottom:var(--space-6);">Dashboard</h1>
-        <div class="metric-grid mb-6">
-          <div class="metric-card"><p class="metric-card__label">Arquivos Processados</p><p class="metric-card__value --brand" id="kpi-processados">0</p></div>
-          <div class="metric-card"><p class="metric-card__label">Registros OK</p><p class="metric-card__value --success" id="kpi-ok">0</p></div>
-          <div class="metric-card"><p class="metric-card__label">Divergentes</p><p class="metric-card__value --danger" id="kpi-divergentes">0</p></div>
-          <div class="metric-card"><p class="metric-card__label">Erros</p><p class="metric-card__value --warning" id="kpi-erros">0</p></div>
-        </div>
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title">Últimos Resultados</span>
-            <span class="badge badge--info" id="badge-total">0 registros</span>
-          </div>
-          <div id="tabela-vazia" style="text-align:center;padding:var(--space-10) 0;color:var(--color-gray-400);">
-            <p class="text-sm">Nenhum arquivo processado ainda.</p>
-            <p class="text-xs text-muted" style="margin-top:var(--space-2);">Vá para Upload para enviar um arquivo.</p>
-          </div>
-          <div id="tabela-wrapper" style="display:none;overflow-x:auto;">
-            <table class="reconcile-table">
-              <thead><tr><th>ID</th><th class="col-value">Valor Arquivo</th><th class="col-value">Recebido</th><th class="col-status">Status</th></tr></thead>
-              <tbody id="tabela-body"></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- UPLOAD -->
-      <section id="section-upload" style="display:none;">
-        <h1 style="font-size:var(--font-size-xl);font-weight:var(--font-weight-medium);margin-bottom:var(--space-6);">Upload de Arquivo</h1>
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title">Enviar arquivo para conciliação</span>
-            <span class="badge badge--info">CSV · XLSX · XLS</span>
-          </div>
-          <div class="drop-zone" id="drop-zone">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M16 4v16M10 10l6-6 6 6M6 22v4a2 2 0 002 2h16a2 2 0 002-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <p style="font-weight:var(--font-weight-medium);">Arraste seu arquivo aqui</p>
-            <p class="text-xs text-muted">ou clique para selecionar</p>
-            <input type="file" id="file-input" accept=".csv,.xlsx,.xls" style="display:none;" />
-          </div>
-          <div id="arquivo-selecionado" style="display:none;margin-top:var(--space-4);">
-            <div class="card" style="background:var(--color-brand-50);border-color:var(--color-brand-200);">
-              <div class="flex items-center gap-4">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="color:var(--color-brand-500);"><rect x="3" y="2" width="14" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 7h6M7 10h6M7 13h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                <span class="text-sm" id="nome-arquivo" style="font-family:var(--font-mono);flex:1;"></span>
-                <button class="btn btn--primary" id="btn-processar">Processar ⛏</button>
-              </div>
-            </div>
-          </div>
-          <div id="progresso-wrapper" style="display:none;margin-top:var(--space-4);">
-            <p class="text-sm text-muted" style="margin-bottom:var(--space-2);">Mineirinho escavando...</p>
-            <div class="progress-bar"><div class="progress-bar__fill" id="progresso-fill" style="width:0%;"></div></div>
-          </div>
-        </div>
-        <div class="card mt-6">
-          <div class="card-header"><span class="card-title">Formato esperado</span></div>
-          <table class="reconcile-table">
-            <thead><tr><th>Coluna</th><th>Tipo</th><th>Exemplo</th></tr></thead>
-            <tbody>
-              <tr><td><code>id</code></td><td><span class="badge badge--info">obrigatório</span></td><td class="text-mono">TXN-001</td></tr>
-              <tr><td><code>valor</code></td><td><span class="badge badge--info">obrigatório</span></td><td class="text-mono">1500.00</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- RESULTADOS -->
-      <section id="section-resultados" style="display:none;">
-        <h1 style="font-size:var(--font-size-xl);font-weight:var(--font-weight-medium);margin-bottom:var(--space-6);">Resultados da Conciliação</h1>
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title">Tabela completa</span>
-            <div class="flex gap-2">
-              <button class="btn btn--secondary btn-filtro active" data-filtro="todos">Todos</button>
-              <button class="btn btn--secondary btn-filtro" data-filtro="OK">OK</button>
-              <button class="btn btn--secondary btn-filtro" data-filtro="DIVERGENTE">Divergentes</button>
-            </div>
-          </div>
-          <div id="resultado-vazio" style="text-align:center;padding:var(--space-10) 0;color:var(--color-gray-400);"><p class="text-sm">Nenhum resultado disponível.</p></div>
-          <div id="resultado-tabela-wrapper" style="display:none;overflow-x:auto;">
-            <table class="reconcile-table">
-              <thead><tr><th>ID</th><th class="col-value">Valor Arquivo</th><th class="col-value">Recebido</th><th class="col-status">Status</th></tr></thead>
-              <tbody id="resultado-body"></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- LOGS -->
-      <section id="section-logs" style="display:none;">
-        <h1 style="font-size:var(--font-size-xl);font-weight:var(--font-weight-medium);margin-bottom:var(--space-6);">Log do Motor</h1>
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title">Eventos do sistema</span>
-            <button class="btn btn--secondary" id="btn-atualizar-log" style="font-size:var(--font-size-xs);">Atualizar</button>
-          </div>
-          <div class="log-viewer" id="log-viewer"><span class="log-muted">· carregando logs...</span></div>
-        </div>
-      </section>
-
-    </main>
+    <!-- Tabela de registros -->
+    <div style="overflow-x:auto;margin-top:16px;">
+      <table class="reconcile-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th class="col-value">Valor Banco</th>
+            <th class="col-value">Valor Sistema</th>
+            <th class="col-status">Status</th>
+          </tr>
+        </thead>
+        <tbody id="modal-resultado-body"></tbody>
+      </table>
+    </div>
   </div>
+</div>
 
-  <!-- TOAST -->
-  <div id="toast" class="toast" style="display:none;"></div>
+<!-- TOAST -->
+<div id="toast" class="toast" style="display:none;"></div>
 
-  <script>
-    const state = { usuario: null, resultados: [], kpis: { processados:0, ok:0, divergentes:0, erros:0 } };
+<script>
+// ══════════════════════════════════════════════
+// ESTADO GLOBAL
+// ══════════════════════════════════════════════
+const state = {
+  usuario: null,
+  loteAtualId: null,
+  condominiosModal: []   // lista de condomínios sendo criados no modal
+};
 
-    // --- LOGIN (chama API Flask) ---
-    document.getElementById("btn-login").addEventListener("click", fazerLogin);
-    document.getElementById("input-senha").addEventListener("keydown", e => { if (e.key === "Enter") fazerLogin(); });
+// ══════════════════════════════════════════════
+// LOGIN / LOGOUT
+// ══════════════════════════════════════════════
+document.getElementById("btn-login").addEventListener("click", fazerLogin);
+document.getElementById("input-senha").addEventListener("keydown", e => { if (e.key === "Enter") fazerLogin(); });
 
-    async function fazerLogin() {
-      const usuario = document.getElementById("input-usuario").value.trim();
-      const senha   = document.getElementById("input-senha").value;
-      const erroEl  = document.getElementById("erro-login");
-
-      try {
-        const res = await fetch("/api/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ usuario, senha })
-        });
-        const dados = await res.json();
-
-        if (dados.ok) {
-          state.usuario = dados.usuario;
-          erroEl.style.display = "none";
-          document.getElementById("tela-login").style.display = "none";
-          document.getElementById("tela-app").style.display = "grid";
-          document.getElementById("nome-usuario").textContent = dados.usuario;
-          adicionarLog(`Usuário '${dados.usuario}' autenticado.`, "ok");
-          mostrarToast("Motor Online! Olá, " + dados.usuario + "!", "success");
-          carregarLogs();
-        } else {
-          erroEl.textContent = dados.erro;
-          erroEl.style.display = "block";
-          document.getElementById("input-senha").value = "";
-        }
-      } catch {
-        erroEl.textContent = "Erro de conexão com o servidor.";
-        erroEl.style.display = "block";
-      }
-    }
-
-    // --- LOGOUT ---
-    document.getElementById("btn-logout").addEventListener("click", fazerLogout);
-    document.getElementById("sidebar-logout").addEventListener("click", fazerLogout);
-
-    async function fazerLogout() {
-      await fetch("/api/logout", { method: "POST" });
-      state.usuario = null;
-      document.getElementById("tela-app").style.display = "none";
-      document.getElementById("tela-login").style.display = "flex";
+async function fazerLogin() {
+  const usuario = document.getElementById("input-usuario").value.trim();
+  const senha   = document.getElementById("input-senha").value;
+  const erroEl  = document.getElementById("erro-login");
+  try {
+    const res   = await fetch("/api/login", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({usuario, senha}) });
+    const dados = await res.json();
+    if (dados.ok) {
+      state.usuario = dados.usuario;
+      erroEl.style.display = "none";
+      document.getElementById("tela-login").style.display = "none";
+      document.getElementById("tela-app").style.display   = "grid";
+      document.getElementById("nome-usuario").textContent = dados.usuario;
+      carregarLotes();
+      mostrarToast("Motor Online! Olá, " + dados.usuario + "!", "success");
+    } else {
+      erroEl.textContent     = dados.erro;
+      erroEl.style.display   = "block";
       document.getElementById("input-senha").value = "";
     }
+  } catch {
+    erroEl.textContent   = "Erro de conexão.";
+    erroEl.style.display = "block";
+  }
+}
 
-    // --- NAVEGAÇÃO ---
-    const sections = ["dashboard","upload","resultados","logs"];
+function fazerLogout() {
+  fetch("/api/logout", { method:"POST" });
+  state.usuario = null;
+  document.getElementById("tela-app").style.display   = "none";
+  document.getElementById("tela-login").style.display = "flex";
+}
+document.getElementById("btn-logout").addEventListener("click", fazerLogout);
+document.getElementById("sidebar-logout").addEventListener("click", fazerLogout);
 
-    function ativarSecao(nome) {
-      sections.forEach(s => {
-        document.getElementById("section-" + s).style.display = s === nome ? "" : "none";
-      });
-      document.querySelectorAll("[data-section]").forEach(el => {
-        el.classList.toggle("active", el.dataset.section === nome);
-      });
-      if (nome === "logs") carregarLogs();
+// ══════════════════════════════════════════════
+// NAVEGAÇÃO
+// ══════════════════════════════════════════════
+document.querySelectorAll("[data-section]").forEach(el => {
+  el.addEventListener("click", () => ativarSecao(el.dataset.section));
+});
+
+function ativarSecao(nome) {
+  ["lotes","logs"].forEach(s => {
+    document.getElementById("section-" + s).style.display = s === nome ? "" : "none";
+  });
+  document.querySelectorAll("[data-section]").forEach(el => {
+    el.classList.toggle("active", el.dataset.section === nome);
+  });
+  if (nome === "logs") carregarLogs();
+}
+
+// ══════════════════════════════════════════════
+// LOTES — LISTAGEM
+// ══════════════════════════════════════════════
+async function carregarLotes() {
+  try {
+    const res   = await fetch("/api/lotes");
+    const lotes = await res.json();
+    renderizarLotes(lotes);
+  } catch {
+    mostrarToast("Erro ao carregar lotes.", "error");
+  }
+}
+
+function renderizarLotes(lotes) {
+  const lista  = document.getElementById("lotes-lista");
+  const vazio  = document.getElementById("lotes-vazio");
+
+  if (!lotes.length) {
+    vazio.style.display = "";
+    lista.innerHTML = "";
+    return;
+  }
+
+  vazio.style.display = "none";
+  lista.innerHTML = lotes.map(lote => {
+    const total  = lote.condominios.length;
+    const ok     = lote.condominios.filter(c => c.status === "concluido").length;
+    const statusBadge = lote.status === "concluido"
+      ? `<span class="badge badge--ok">Concluído</span>`
+      : `<span class="badge badge--warn">Pendente</span>`;
+
+    const condCards = lote.condominios.map(c => `
+      <div class="cond-chip ${c.status === 'concluido' ? '--ok' : ''}" onclick="verResultado(${c.id}, '${c.nome.replace(/'/g,"\\'")}')">
+        <span class="cond-chip__icon">${c.status === 'concluido' ? '✅' : '⏳'}</span>
+        <span>${c.nome}</span>
+      </div>
+    `).join("");
+
+    return `
+      <div class="lote-card">
+        <div class="lote-card__header">
+          <div>
+            <div class="lote-card__nome">${lote.nome}</div>
+            <div class="lote-card__meta">${lote.criado_em} · ${total} condomínio${total !== 1 ? 's' : ''}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            ${statusBadge}
+          </div>
+        </div>
+        <div class="cond-chips">${condCards || '<span class="text-muted text-sm">Nenhum condomínio</span>'}</div>
+      </div>
+    `;
+  }).join("");
+}
+
+// ══════════════════════════════════════════════
+// MODAL: NOVO LOTE
+// ══════════════════════════════════════════════
+document.getElementById("btn-novo-lote").addEventListener("click", abrirModalLote);
+document.getElementById("btn-fechar-modal").addEventListener("click", fecharModal);
+document.getElementById("btn-cancelar-lote").addEventListener("click", fecharModal);
+document.getElementById("btn-cancelar-lote2").addEventListener("click", fecharModal);
+
+function abrirModalLote() {
+  state.loteAtualId = null;
+  state.condominiosModal = [];
+  document.getElementById("input-nome-lote").value = "";
+  document.getElementById("condominios-lista-modal").innerHTML = "";
+  document.getElementById("modal-passo1").style.display = "";
+  document.getElementById("modal-passo2").style.display = "none";
+  document.getElementById("modal-overlay").style.display = "flex";
+}
+
+function fecharModal() {
+  document.getElementById("modal-overlay").style.display = "none";
+  carregarLotes();
+}
+
+// PASSO 1: Criar lote
+document.getElementById("btn-criar-lote").addEventListener("click", async () => {
+  const nome = document.getElementById("input-nome-lote").value.trim();
+  if (!nome) { mostrarToast("Digite o nome do lote.", "error"); return; }
+
+  const res   = await fetch("/api/lotes", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({nome}) });
+  const dados = await res.json();
+
+  if (!dados.ok) { mostrarToast("Erro ao criar lote.", "error"); return; }
+
+  state.loteAtualId = dados.id;
+  document.getElementById("modal-passo1").style.display = "none";
+  document.getElementById("modal-passo2").style.display = "";
+  mostrarToast(`Lote "${nome}" criado!`, "success");
+});
+
+// PASSO 2: Adicionar condomínio
+document.getElementById("btn-add-condominio").addEventListener("click", () => {
+  const id = Date.now(); // ID temporário para o DOM
+  state.condominiosModal.push({ tempId: id, condId: null, nome: "", uploadFeito: false });
+  renderizarCondominiosModal();
+});
+
+function renderizarCondominiosModal() {
+  const container = document.getElementById("condominios-lista-modal");
+  container.innerHTML = state.condominiosModal.map((c, idx) => `
+    <div class="cond-form" id="cond-form-${c.tempId}">
+      <div class="cond-form__header">
+        <span class="cond-form__num">🏢 Condomínio ${idx + 1}</span>
+        <button class="btn btn--ghost btn--sm" onclick="removerCondominio(${c.tempId})">✕ Remover</button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Nome do Condomínio</label>
+        <input class="form-input" id="nome-cond-${c.tempId}" type="text" placeholder="Ex: Condomínio Solar"
+          value="${c.nome}" onchange="atualizarNomeCond(${c.tempId}, this.value)" />
+      </div>
+
+      <div class="upload-duo" style="margin-top:12px;">
+        <div class="upload-slot ${c.uploadFeito ? '--done' : ''}" id="slot-banco-${c.tempId}">
+          <label class="upload-slot__label">
+            🏦 Extrato do Banco
+            <span class="upload-slot__ext">CSV · XLSX · PDF</span>
+          </label>
+          <input type="file" id="file-banco-${c.tempId}" accept=".csv,.xlsx,.xls,.pdf" style="display:none;"
+            onchange="marcarArquivo(${c.tempId}, 'banco', this)" />
+          <button class="btn btn--secondary btn--sm" onclick="document.getElementById('file-banco-${c.tempId}').click()">
+            Selecionar arquivo
+          </button>
+          <span class="upload-slot__nome" id="nome-banco-${c.tempId}"></span>
+        </div>
+
+        <div class="upload-slot" id="slot-sistema-${c.tempId}">
+          <label class="upload-slot__label">
+            🏢 Relatório do Sistema
+            <span class="upload-slot__ext">CSV · XLSX · PDF</span>
+          </label>
+          <input type="file" id="file-sistema-${c.tempId}" accept=".csv,.xlsx,.xls,.pdf" style="display:none;"
+            onchange="marcarArquivo(${c.tempId}, 'sistema', this)" />
+          <button class="btn btn--secondary btn--sm" onclick="document.getElementById('file-sistema-${c.tempId}').click()">
+            Selecionar arquivo
+          </button>
+          <span class="upload-slot__nome" id="nome-sistema-${c.tempId}"></span>
+        </div>
+      </div>
+
+      <button class="btn btn--primary btn--sm" style="margin-top:10px;" onclick="enviarArquivosCond(${c.tempId})">
+        ✓ Confirmar arquivos
+      </button>
+      <span class="cond-confirmado" id="confirmado-${c.tempId}" style="display:none;">✅ Arquivos confirmados!</span>
+    </div>
+  `).join("");
+}
+
+function atualizarNomeCond(tempId, nome) {
+  const c = state.condominiosModal.find(x => x.tempId === tempId);
+  if (c) c.nome = nome;
+}
+
+function marcarArquivo(tempId, tipo, input) {
+  const nome = input.files[0]?.name || "";
+  document.getElementById(`nome-${tipo}-${tempId}`).textContent = nome;
+}
+
+function removerCondominio(tempId) {
+  state.condominiosModal = state.condominiosModal.filter(c => c.tempId !== tempId);
+  renderizarCondominiosModal();
+}
+
+async function enviarArquivosCond(tempId) {
+  const c      = state.condominiosModal.find(x => x.tempId === tempId);
+  const nome   = document.getElementById(`nome-cond-${tempId}`).value.trim();
+  const fBanco = document.getElementById(`file-banco-${tempId}`).files[0];
+  const fSist  = document.getElementById(`file-sistema-${tempId}`).files[0];
+
+  if (!nome)   { mostrarToast("Digite o nome do condomínio.", "error"); return; }
+  if (!fBanco) { mostrarToast("Selecione o extrato do banco.", "error"); return; }
+  if (!fSist)  { mostrarToast("Selecione o relatório do sistema.", "error"); return; }
+
+  // Cria o condomínio no backend se ainda não foi criado
+  if (!c.condId) {
+    const formNome = new FormData();
+    formNome.append("nome", nome);
+    const res   = await fetch(`/api/lotes/${state.loteAtualId}/condominios`, { method:"POST", body: formNome });
+    const dados = await res.json();
+    if (!dados.ok) { mostrarToast("Erro ao criar condomínio.", "error"); return; }
+    c.condId = dados.id;
+    c.nome   = nome;
+  }
+
+  // Envia os arquivos
+  const form = new FormData();
+  form.append("arquivo_banco",   fBanco);
+  form.append("arquivo_sistema", fSist);
+  const res2 = await fetch(`/api/condominios/${c.condId}/upload`, { method:"POST", body: form });
+  const d2   = await res2.json();
+
+  if (!d2.ok) { mostrarToast("Erro no upload: " + d2.erro, "error"); return; }
+
+  c.uploadFeito = true;
+  document.getElementById(`confirmado-${tempId}`).style.display = "";
+  mostrarToast(`"${nome}" pronto!`, "success");
+}
+
+// PROCESSAR LOTE
+document.getElementById("btn-processar-lote").addEventListener("click", async () => {
+  const prontos = state.condominiosModal.filter(c => c.uploadFeito);
+  if (!prontos.length) {
+    mostrarToast("Confirme os arquivos de pelo menos um condomínio.", "error");
+    return;
+  }
+
+  const btn = document.getElementById("btn-processar-lote");
+  btn.disabled     = true;
+  btn.textContent  = "⛏ Processando com IA...";
+
+  try {
+    const res   = await fetch(`/api/lotes/${state.loteAtualId}/processar`, { method:"POST" });
+    const dados = await res.json();
+
+    if (!dados.ok) {
+      mostrarToast("Erro ao processar: " + dados.erro, "error");
+      btn.disabled    = false;
+      btn.textContent = "⛏ Processar com IA";
+      return;
     }
 
-    document.querySelectorAll("[data-section]").forEach(el => {
-      el.addEventListener("click", () => ativarSecao(el.dataset.section));
-    });
+    fecharModal();
+    mostrarToast("Lote processado com sucesso!", "success");
+  } catch {
+    mostrarToast("Erro de conexão.", "error");
+    btn.disabled    = false;
+    btn.textContent = "⛏ Processar com IA";
+  }
+});
 
-    // --- UPLOAD (envia arquivo real para o Flask) ---
-    const dropZone   = document.getElementById("drop-zone");
-    const fileInput  = document.getElementById("file-input");
-    let arquivoAtual = null;
+// ══════════════════════════════════════════════
+// MODAL: RESULTADO DO CONDOMÍNIO
+// ══════════════════════════════════════════════
+document.getElementById("btn-fechar-resultado").addEventListener("click", () => {
+  document.getElementById("modal-resultado-overlay").style.display = "none";
+});
 
-    dropZone.addEventListener("click", () => fileInput.click());
-    dropZone.addEventListener("dragover", e => { e.preventDefault(); dropZone.classList.add("--active"); });
-    dropZone.addEventListener("dragleave", () => dropZone.classList.remove("--active"));
-    dropZone.addEventListener("drop", e => { e.preventDefault(); dropZone.classList.remove("--active"); if (e.dataTransfer.files.length) carregarArquivo(e.dataTransfer.files[0]); });
-    fileInput.addEventListener("change", () => { if (fileInput.files.length) carregarArquivo(fileInput.files[0]); });
+async function verResultado(condId, nome) {
+  const res   = await fetch(`/api/condominios/${condId}`);
+  const dados = await res.json();
 
-    function carregarArquivo(file) {
-      const ext = file.name.split(".").pop().toLowerCase();
-      if (!["csv","xlsx","xls"].includes(ext)) { mostrarToast("Extensão não suportada: ." + ext, "error"); return; }
-      arquivoAtual = file;
-      document.getElementById("nome-arquivo").textContent = file.name;
-      document.getElementById("arquivo-selecionado").style.display = "";
-    }
+  if (dados.erro) { mostrarToast(dados.erro, "error"); return; }
 
-    document.getElementById("btn-processar").addEventListener("click", async () => {
-      if (!arquivoAtual) return;
+  document.getElementById("modal-resultado-titulo").textContent = "📊 " + nome;
+  document.getElementById("modal-analise-ia").textContent       = dados.analise_ia || "Sem análise disponível.";
 
-      const btn = document.getElementById("btn-processar");
-      const progWrap = document.getElementById("progresso-wrapper");
-      const progFill = document.getElementById("progresso-fill");
+  const tbody = document.getElementById("modal-resultado-body");
+  tbody.innerHTML = (dados.registros || []).map(r => {
+    const badge = {
+      "OK":             `<span class="badge badge--ok">OK</span>`,
+      "DIVERGENTE":     `<span class="badge badge--diverge">Divergente</span>`,
+      "APENAS_BANCO":   `<span class="badge badge--warn">Só no Banco</span>`,
+      "APENAS_SISTEMA": `<span class="badge badge--warn">Só no Sistema</span>`,
+    }[r.status] || r.status;
 
-      btn.disabled = true;
-      progWrap.style.display = "";
+    const fmt = v => v != null ? `R$ ${parseFloat(v).toFixed(2).replace(".", ",")}` : "—";
 
-      // Anima progresso enquanto aguarda resposta
-      let pct = 0;
-      const anim = setInterval(() => {
-        pct = Math.min(pct + 5, 90);
-        progFill.style.width = pct + "%";
-      }, 150);
+    return `<tr>
+      <td>${r.id}</td>
+      <td class="col-value">${fmt(r.valor_banco)}</td>
+      <td class="col-value">${fmt(r.valor_sistema)}</td>
+      <td class="col-status">${badge}</td>
+    </tr>`;
+  }).join("");
 
-      const formData = new FormData();
-      formData.append("arquivo", arquivoAtual);
+  document.getElementById("modal-resultado-overlay").style.display = "flex";
+}
 
-      try {
-        const res = await fetch("/api/upload", { method: "POST", body: formData });
-        const dados = await res.json();
+// ══════════════════════════════════════════════
+// LOGS
+// ══════════════════════════════════════════════
+document.getElementById("btn-atualizar-log").addEventListener("click", carregarLogs);
 
-        clearInterval(anim);
-        progFill.style.width = "100%";
+async function carregarLogs() {
+  try {
+    const res   = await fetch("/api/logs");
+    const dados = await res.json();
+    const viewer = document.getElementById("log-viewer");
+    viewer.innerHTML = dados.linhas.map(linha => {
+      let cls = "log-info";
+      if (linha.includes("[ERROR]"))   cls = "log-error";
+      else if (linha.includes("[WARNING]")) cls = "log-warn";
+      else if (linha.includes("[INFO]"))    cls = "log-ok";
+      return `<div><span class="${cls}">${linha}</span></div>`;
+    }).join("");
+    viewer.scrollTop = viewer.scrollHeight;
+  } catch {
+    mostrarToast("Erro ao carregar logs.", "error");
+  }
+}
 
-        setTimeout(() => {
-          progWrap.style.display = "none";
-          progFill.style.width = "0%";
-          btn.disabled = false;
-          document.getElementById("arquivo-selecionado").style.display = "none";
-          arquivoAtual = null;
-
-          if (dados.erro) {
-            mostrarToast("Erro: " + dados.erro, "error");
-            adicionarLog("ERRO: " + dados.erro, "error");
-            state.kpis.erros++;
-            atualizarKPIs();
-          } else {
-            state.resultados = dados.registros;
-            state.kpis.processados++;
-            state.kpis.ok          += dados.ok;
-            state.kpis.divergentes += dados.divergentes;
-            atualizarKPIs();
-            renderizarTabela(dados.registros, "tabela-body", "tabela-vazia", "tabela-wrapper", dados.total);
-            renderizarTabela(dados.registros, "resultado-body", "resultado-vazio", "resultado-tabela-wrapper", dados.total);
-            adicionarLog(`Arquivo '${dados.arquivo}' processado. OK: ${dados.ok} | Divergentes: ${dados.divergentes}`, "ok");
-            mostrarToast("Processado com sucesso!", "success");
-            ativarSecao("resultados");
-          }
-        }, 400);
-
-      } catch {
-        clearInterval(anim);
-        progWrap.style.display = "none";
-        btn.disabled = false;
-        mostrarToast("Erro de conexão com o servidor.", "error");
-      }
-    });
-
-    // --- TABELAS ---
-    function renderizarTabela(dados, tbodyId, vazioId, wrapperId, total) {
-      const tbody = document.getElementById(tbodyId);
-      tbody.innerHTML = "";
-      dados.forEach(r => {
-        const tr = document.createElement("tr");
-        const badge = r.status === "OK"
-          ? `<span class="badge badge--ok">OK</span>`
-          : `<span class="badge badge--diverge">DIVERGENTE</span>`;
-        const fmt = v => `R$ ${parseFloat(v).toFixed(2).replace(".", ",")}`;
-        tr.innerHTML = `<td>${r.id}</td><td class="col-value">${fmt(r.valor)}</td><td class="col-value">${fmt(r.recebido)}</td><td class="col-status">${badge}</td>`;
-        tbody.appendChild(tr);
-      });
-      document.getElementById(vazioId).style.display = "none";
-      document.getElementById(wrapperId).style.display = "";
-      document.getElementById("badge-total").textContent = total + " registros";
-    }
-
-    function atualizarKPIs() {
-      document.getElementById("kpi-processados").textContent = state.kpis.processados;
-      document.getElementById("kpi-ok").textContent          = state.kpis.ok;
-      document.getElementById("kpi-divergentes").textContent = state.kpis.divergentes;
-      document.getElementById("kpi-erros").textContent       = state.kpis.erros;
-    }
-
-    // --- FILTROS ---
-    document.querySelectorAll(".btn-filtro").forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".btn-filtro").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        const filtro = btn.dataset.filtro;
-        const filtrados = filtro === "todos" ? state.resultados : state.resultados.filter(r => r.status === filtro);
-        renderizarTabela(filtrados, "resultado-body", "resultado-vazio", "resultado-tabela-wrapper", filtrados.length);
-      });
-    });
-
-    // --- LOGS (busca do servidor) ---
-    async function carregarLogs() {
-      try {
-        const res = await fetch("/api/logs");
-        const dados = await res.json();
-        const viewer = document.getElementById("log-viewer");
-        viewer.innerHTML = "";
-        dados.linhas.forEach(linha => {
-          const div = document.createElement("div");
-          let cls = "log-info";
-          if (linha.includes("[ERROR]"))   cls = "log-error";
-          else if (linha.includes("[WARNING]")) cls = "log-warn";
-          else if (linha.includes("[INFO]"))    cls = "log-ok";
-          div.innerHTML = `<span class="${cls}">${linha}</span>`;
-          viewer.appendChild(div);
-        });
-        viewer.scrollTop = viewer.scrollHeight;
-      } catch {
-        adicionarLog("Erro ao buscar logs do servidor.", "error");
-      }
-    }
-
-    document.getElementById("btn-atualizar-log").addEventListener("click", carregarLogs);
-
-    // --- LOG LOCAL (mensagens da interface) ---
-    function adicionarLog(msg, tipo = "info") {
-      const cls = { ok:"log-ok", warn:"log-warn", error:"log-error", info:"log-info" }[tipo];
-      const div = document.createElement("div");
-      const hora = new Date().toLocaleTimeString("pt-BR");
-      div.innerHTML = `<span class="log-muted">[${hora}]</span> <span class="${cls}">${msg}</span>`;
-      document.getElementById("log-viewer").appendChild(div);
-    }
-
-    // --- TOAST ---
-    let toastTimer = null;
-    function mostrarToast(msg, tipo = "success") {
-      const t = document.getElementById("toast");
-      t.className = `toast toast--${tipo}`;
-      t.textContent = msg;
-      t.style.display = "flex";
-      if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => { t.style.display = "none"; }, 3500);
-    }
-  </script>
+// ══════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════
+let toastTimer = null;
+function mostrarToast(msg, tipo = "success") {
+  const t = document.getElementById("toast");
+  t.className      = `toast toast--${tipo}`;
+  t.textContent    = msg;
+  t.style.display  = "flex";
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.style.display = "none"; }, 3500);
+}
+</script>
 </body>
 </html>

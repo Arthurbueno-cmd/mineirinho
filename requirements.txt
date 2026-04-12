@@ -4,3 +4,5 @@ pandas
 openpyxl
 xlrd
 werkzeug
+pdfplumber
+anthropic

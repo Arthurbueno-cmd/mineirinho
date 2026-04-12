@@ -502,3 +502,255 @@ code, pre { font-family: var(--font-mono); font-size: var(--font-size-sm); }
    - Modal de detalhes de divergência (seção 9)
    - Autenticação web (seção 10)
    ============================================================ */
+
+/* ============================================================
+   NOVOS ESTILOS — LOTES E CONDOMÍNIOS
+   ============================================================ */
+
+/* LOGIN */
+#tela-login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: var(--color-brand-900);
+}
+.login-card {
+  background: #fff;
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  width: 360px;
+  box-shadow: var(--shadow-lg);
+}
+.login-logo {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-brand-500);
+  letter-spacing: 0.08em;
+  text-align: center;
+  margin-bottom: var(--space-2);
+}
+.login-sub {
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-500);
+  margin-bottom: var(--space-6);
+}
+.erro-msg { font-size: var(--font-size-xs); color: var(--color-danger); margin-top: 6px; }
+.btn--full { width: 100%; justify-content: center; }
+
+/* HEADER */
+.header-nav { display: flex; gap: var(--space-2); margin-left: var(--space-8); }
+.btn-nav {
+  padding: 6px 14px;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-brand-300);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.btn-nav:hover { background: var(--color-brand-700); color: #fff; }
+.btn-nav.active { background: var(--color-brand-600); color: #fff; }
+.header-right { margin-left: auto; display: flex; align-items: center; gap: var(--space-3); }
+.usuario-label { font-size: var(--font-size-sm); color: var(--color-brand-300); }
+.btn--ghost {
+  background: transparent;
+  border: 0.5px solid var(--color-brand-700);
+  color: var(--color-brand-300);
+  padding: 4px 10px;
+  font-size: var(--font-size-xs);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+.btn--ghost:hover { background: var(--color-brand-700); color: #fff; }
+
+/* SEÇÃO */
+.section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-6);
+}
+.section-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-medium);
+}
+.section-sub {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-500);
+  margin-top: 4px;
+}
+
+/* EMPTY STATE */
+.empty-state {
+  text-align: center;
+  padding: 60px 0;
+  color: var(--color-gray-400);
+}
+.empty-icon { font-size: 40px; margin-bottom: var(--space-4); }
+
+/* LOTE CARD */
+.lote-card {
+  background: #fff;
+  border: var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) var(--space-6);
+  margin-bottom: var(--space-4);
+  box-shadow: var(--shadow-sm);
+}
+.lote-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+.lote-card__nome {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+}
+.lote-card__meta {
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-500);
+  margin-top: 2px;
+}
+
+/* CHIPS DE CONDOMÍNIO */
+.cond-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.cond-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  background: var(--color-gray-100);
+  border: var(--border-default);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+.cond-chip:hover { background: var(--color-brand-50); border-color: var(--color-brand-300); }
+.cond-chip.--ok  { background: var(--color-success-bg); border-color: var(--color-success); }
+.cond-chip__icon { font-size: 14px; }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: var(--space-4);
+}
+.modal {
+  background: #fff;
+  border-radius: var(--radius-xl);
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: var(--space-6);
+  box-shadow: var(--shadow-lg);
+}
+.modal--lg { max-width: 780px; }
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+}
+.modal-title { font-size: var(--font-size-md); font-weight: var(--font-weight-medium); }
+.modal-close {
+  background: none; border: none; font-size: 18px;
+  color: var(--color-gray-500); cursor: pointer;
+}
+.modal-close:hover { color: var(--color-gray-900); }
+.modal-desc { font-size: var(--font-size-sm); color: var(--color-gray-500); margin-bottom: var(--space-4); }
+.modal-footer { display: flex; justify-content: flex-end; gap: var(--space-3); margin-top: var(--space-5); }
+
+/* FORMULÁRIO DE CONDOMÍNIO */
+.cond-form {
+  border: var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+  background: var(--color-gray-50);
+}
+.cond-form__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+.cond-form__num {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-brand-600);
+}
+.btn--sm { padding: 4px 10px; font-size: var(--font-size-xs); }
+
+/* UPLOAD DUO */
+.upload-duo { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+.upload-slot {
+  border: 1.5px dashed var(--color-gray-300);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color var(--transition-fast);
+}
+.upload-slot.--done { border-color: var(--color-success); background: var(--color-success-bg); }
+.upload-slot__label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-700);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.upload-slot__ext { font-weight: 400; color: var(--color-gray-400); }
+.upload-slot__nome {
+  font-size: var(--font-size-xs);
+  color: var(--color-brand-600);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cond-confirmado {
+  font-size: var(--font-size-xs);
+  color: var(--color-success);
+  margin-left: 8px;
+  font-weight: var(--font-weight-medium);
+}
+
+/* IA BOX */
+.ia-box {
+  border: 1.5px solid var(--color-brand-200);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.ia-box__header {
+  background: var(--color-brand-50);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-brand-600);
+  border-bottom: 1px solid var(--color-brand-200);
+}
+.ia-box__content {
+  padding: var(--space-4);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-700);
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+/* BADGE EXTRAS */
+.badge--warn { background: var(--color-warning-bg); color: var(--color-warning); }
