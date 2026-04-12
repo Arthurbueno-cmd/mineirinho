@@ -47,6 +47,17 @@ def configurar_banco() -> None:
                 criado_em TEXT
             )
         """)
+        # Migração: adiciona colunas novas se banco legado não tiver
+        colunas = [r[1] for r in conn.execute("PRAGMA table_info(usuarios)").fetchall()]
+        if "papel" not in colunas:
+            conn.execute("ALTER TABLE usuarios ADD COLUMN papel TEXT DEFAULT 'cliente'")
+            conn.execute("UPDATE usuarios SET papel='admin' WHERE nome=?",
+                         (os.environ.get("ADMIN_USER","arthur"),))
+        if "dono_id" not in colunas:
+            conn.execute("ALTER TABLE usuarios ADD COLUMN dono_id INTEGER")
+        if "criado_em" not in colunas:
+            conn.execute("ALTER TABLE usuarios ADD COLUMN criado_em TEXT")
+
         # Lotes vinculados a um usuário
         conn.execute("""
             CREATE TABLE IF NOT EXISTS lotes (
@@ -57,6 +68,11 @@ def configurar_banco() -> None:
                 usuario_id INTEGER NOT NULL
             )
         """)
+        # Migração: adiciona usuario_id na tabela lotes se não existir
+        cols_lotes = [r[1] for r in conn.execute("PRAGMA table_info(lotes)").fetchall()]
+        if "usuario_id" not in cols_lotes:
+            conn.execute("ALTER TABLE lotes ADD COLUMN usuario_id INTEGER DEFAULT 1")
+
         # Condomínios
         conn.execute("""
             CREATE TABLE IF NOT EXISTS condominios (
