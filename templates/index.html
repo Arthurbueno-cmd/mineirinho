@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mineirinho V3.0</title>
+  <title>Bueno Finance</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet" />
@@ -13,31 +13,46 @@
 
 <!-- LOGIN -->
 <div id="tela-login">
+  <!-- ESQUERDO -->
   <div class="login-left">
+    <div class="login-grid"></div>
     <div class="login-brand">
-      <div class="login-brand__icon">⛏</div>
-      <span class="login-brand__name">Mineirinho V3.0</span>
+      <div class="login-brand__logo">💼</div>
+      <div class="login-brand__text">
+        <span class="login-brand__name">Bueno Finance</span>
+        <span class="login-brand__tag">Plataforma de Conciliação</span>
+      </div>
     </div>
-    <div class="login-hero">
-      <h1 class="login-hero__title">Conciliação<br><span>financeira</span><br>inteligente.</h1>
-      <p class="login-hero__sub">Processe extratos bancários e relatórios de condomínios com análise automática de IA.</p>
+    <h1 class="login-headline">Conciliação<br><span class="accent">financeira</span><br><span class="accent-green">inteligente.</span></h1>
+    <p class="login-tagline">Analise extratos bancários e relatórios de condomínios com o poder da inteligência artificial. Rápido, preciso e seguro.</p>
+    <div class="login-features">
+      <div class="login-feature"><div class="login-feature__icon">🏢</div>Múltiplos condomínios em um lote</div>
+      <div class="login-feature"><div class="login-feature__icon">🤖</div>Análise automática com IA</div>
+      <div class="login-feature"><div class="login-feature__icon">📄</div>Suporte a CSV, XLSX e PDF</div>
+      <div class="login-feature"><div class="login-feature__icon">👥</div>Gestão de usuários e equipes</div>
     </div>
-    <div class="login-dots"><span></span><span></span><span></span></div>
   </div>
+  <!-- DIREITO -->
   <div class="login-right">
-    <div class="login-card">
-      <div class="login-logo">Bem-vindo 👋</div>
-      <p class="login-sub">Entre com suas credenciais para continuar</p>
-      <div class="form-group">
+    <div class="login-form-wrap">
+      <p class="login-welcome">Bem-vindo de volta</p>
+      <h2 class="login-title">Conecte-se</h2>
+      <p class="login-subtitle">Acesse sua conta para continuar</p>
+      <div class="input-wrap">
         <label class="form-label">Usuário</label>
-        <input class="form-input" id="input-usuario" type="text" placeholder="seu usuário" />
+        <input class="form-input" id="input-usuario" type="text" placeholder="seu usuário" autocomplete="username" />
       </div>
-      <div class="form-group" style="margin-top:16px;">
+      <div class="input-wrap">
         <label class="form-label">Senha</label>
-        <input class="form-input" id="input-senha" type="password" placeholder="••••••••" />
+        <input class="form-input" id="input-senha" type="password" placeholder="••••••••" autocomplete="current-password" />
+        <button class="input-eye" id="btn-olho" tabindex="-1" onclick="toggleSenha()">
+          <svg id="olho-aberto" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <svg id="olho-fechado" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+        </button>
       </div>
-      <p id="erro-login" class="erro-msg" style="display:none;"></p>
-      <button class="btn btn--primary btn--full" id="btn-login" style="margin-top:24px;height:46px;font-size:14px;">Entrar →</button>
+      <p id="erro-login" class="erro-msg" style="display:none;">⚠ </p>
+      <button class="btn--login" id="btn-login">Entrar <span style="font-size:18px;">→</span></button>
+      <p class="login-footer">Bueno Finance © 2026 · Todos os direitos reservados</p>
     </div>
   </div>
 </div>
@@ -46,7 +61,7 @@
 <div id="tela-app" class="app-layout" style="display:none;">
 
   <header class="app-header">
-    <span class="logo">⛏ Mineirinho V3.0</span>
+    <div class="logo"><div class="logo__icon">💼</div>Bueno <span class="logo__finance">Finance</span></div>
     <nav class="header-nav">
       <button class="btn-nav active" data-section="dashboard">Dashboard</button>
       <button class="btn-nav" data-section="lotes">Lotes</button>
@@ -692,6 +707,22 @@ async function carregarLogs(){
   } catch { mostrarToast("Erro ao carregar logs.","error"); }
 }
 
+
+// ── TOGGLE SENHA ──
+function toggleSenha() {
+  const input = document.getElementById("input-senha");
+  const aberto = document.getElementById("olho-aberto");
+  const fechado = document.getElementById("olho-fechado");
+  if (input.type === "password") {
+    input.type = "text";
+    aberto.style.display = "none";
+    fechado.style.display = "";
+  } else {
+    input.type = "password";
+    aberto.style.display = "";
+    fechado.style.display = "none";
+  }
+}
 // ── TOAST ──
 let toastTimer=null;
 function mostrarToast(msg,tipo="success"){
