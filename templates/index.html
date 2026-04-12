@@ -18,7 +18,7 @@
     <p class="login-sub">Conciliação Financeira Inteligente</p>
     <div class="form-group">
       <label class="form-label">Usuário</label>
-      <input class="form-input" id="input-usuario" type="text" placeholder="arthur" />
+      <input class="form-input" id="input-usuario" type="text" placeholder="seu usuário" />
     </div>
     <div class="form-group" style="margin-top:12px;">
       <label class="form-label">Senha</label>
@@ -38,6 +38,7 @@
       <button class="btn-nav active" data-section="dashboard">Dashboard</button>
       <button class="btn-nav" data-section="lotes">Lotes</button>
       <button class="btn-nav" data-section="resultados">Resultados</button>
+      <button class="btn-nav admin-only" data-section="usuarios" style="display:none;">Usuários</button>
       <button class="btn-nav" data-section="logs">Logs</button>
     </nav>
     <div class="header-right">
@@ -45,6 +46,7 @@
       <span class="status-label">Online</span>
       <span style="color:#52525A;">|</span>
       <span id="nome-usuario" class="usuario-label"></span>
+      <button class="btn btn--ghost" id="btn-perfil">⚙ Perfil</button>
       <button class="btn btn--ghost" id="btn-logout">Sair</button>
     </div>
   </header>
@@ -60,8 +62,12 @@
       Lotes
     </div>
     <div class="sidebar-item" data-section="resultados">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M1 6h14" stroke="currentColor" stroke-width="1.5"/><path d="M5 10h2M9 10h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M1 6h14M5 10h2M9 10h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       Resultados
+    </div>
+    <div class="sidebar-item admin-only" data-section="usuarios" style="display:none;">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M2 14c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Usuários
     </div>
     <div class="sidebar-item" data-section="logs">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -76,33 +82,17 @@
 
   <main class="app-main">
 
-    <!-- ── DASHBOARD ── -->
+    <!-- DASHBOARD -->
     <section id="section-dashboard">
       <div class="section-header">
-        <div>
-          <h1 class="section-title">Dashboard</h1>
-          <p class="section-sub">Visão geral de todos os lotes processados</p>
-        </div>
+        <div><h1 class="section-title">Dashboard</h1><p class="section-sub">Visão geral de todos os lotes</p></div>
       </div>
       <div class="metric-grid mb-6">
-        <div class="metric-card">
-          <p class="metric-card__label">Lotes Processados</p>
-          <p class="metric-card__value --brand" id="kpi-lotes">0</p>
-        </div>
-        <div class="metric-card">
-          <p class="metric-card__label">Condomínios</p>
-          <p class="metric-card__value --brand" id="kpi-condominios">0</p>
-        </div>
-        <div class="metric-card">
-          <p class="metric-card__label">Registros OK</p>
-          <p class="metric-card__value --success" id="kpi-ok">0</p>
-        </div>
-        <div class="metric-card">
-          <p class="metric-card__label">Divergentes</p>
-          <p class="metric-card__value --danger" id="kpi-divergentes">0</p>
-        </div>
+        <div class="metric-card"><p class="metric-card__label">Lotes</p><p class="metric-card__value --brand" id="kpi-lotes">0</p></div>
+        <div class="metric-card"><p class="metric-card__label">Condomínios</p><p class="metric-card__value --brand" id="kpi-condominios">0</p></div>
+        <div class="metric-card"><p class="metric-card__label">Registros OK</p><p class="metric-card__value --success" id="kpi-ok">0</p></div>
+        <div class="metric-card"><p class="metric-card__label">Divergentes</p><p class="metric-card__value --danger" id="kpi-divergentes">0</p></div>
       </div>
-
       <div class="card">
         <div class="card-header">
           <span class="card-title">Últimos Lotes</span>
@@ -110,37 +100,26 @@
         </div>
         <div id="dashboard-vazio" style="text-align:center;padding:40px 0;color:var(--color-gray-400);">
           <p class="text-sm">Nenhum lote processado ainda.</p>
-          <p class="text-xs text-muted" style="margin-top:6px;">Vá para Lotes para criar e processar.</p>
         </div>
         <div id="dashboard-lista" style="display:none;"></div>
       </div>
     </section>
 
-    <!-- ── LOTES ── -->
+    <!-- LOTES -->
     <section id="section-lotes" style="display:none;">
       <div class="section-header">
-        <div>
-          <h1 class="section-title">Lotes de Conciliação</h1>
-          <p class="section-sub">Agrupe vários condomínios e processe com IA</p>
-        </div>
+        <div><h1 class="section-title">Lotes de Conciliação</h1><p class="section-sub">Agrupe condomínios e processe com IA</p></div>
         <button class="btn btn--primary" id="btn-novo-lote">+ Novo Lote</button>
       </div>
-      <div id="lotes-vazio" class="empty-state">
-        <div class="empty-icon">📂</div>
-        <p>Nenhum lote criado ainda.</p>
-        <p class="text-muted text-sm">Clique em "Novo Lote" para começar.</p>
-      </div>
+      <div id="lotes-vazio" class="empty-state"><div class="empty-icon">📂</div><p>Nenhum lote criado.</p></div>
       <div id="lotes-lista"></div>
     </section>
 
-    <!-- ── RESULTADOS ── -->
+    <!-- RESULTADOS -->
     <section id="section-resultados" style="display:none;">
       <div class="section-header">
-        <div>
-          <h1 class="section-title">Resultados</h1>
-          <p class="section-sub">Todos os registros processados</p>
-        </div>
-        <div style="display:flex;gap:8px;">
+        <div><h1 class="section-title">Resultados</h1><p class="section-sub">Todos os registros processados</p></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button class="btn btn--secondary btn-filtro active" data-filtro="todos">Todos</button>
           <button class="btn btn--secondary btn-filtro" data-filtro="OK">OK</button>
           <button class="btn btn--secondary btn-filtro" data-filtro="DIVERGENTE">Divergentes</button>
@@ -149,38 +128,40 @@
         </div>
       </div>
       <div class="card">
-        <div id="resultado-vazio" style="text-align:center;padding:40px 0;color:var(--color-gray-400);">
-          <p class="text-sm">Nenhum resultado disponível.</p>
-        </div>
+        <div id="resultado-vazio" style="text-align:center;padding:40px 0;color:var(--color-gray-400);"><p class="text-sm">Nenhum resultado disponível.</p></div>
         <div id="resultado-wrapper" style="display:none;overflow-x:auto;">
           <table class="reconcile-table">
-            <thead>
-              <tr>
-                <th>Condomínio</th>
-                <th>ID</th>
-                <th class="col-value">Valor Banco</th>
-                <th class="col-value">Valor Sistema</th>
-                <th class="col-status">Status</th>
-              </tr>
-            </thead>
+            <thead><tr><th>Condomínio</th><th>ID</th><th class="col-value">Valor Banco</th><th class="col-value">Valor Sistema</th><th class="col-status">Status</th></tr></thead>
             <tbody id="resultado-body"></tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <!-- ── LOGS ── -->
-    <section id="section-logs" style="display:none;">
+    <!-- USUÁRIOS -->
+    <section id="section-usuarios" style="display:none;">
       <div class="section-header">
-        <div>
-          <h1 class="section-title">Log do Motor</h1>
-          <p class="section-sub">Eventos do sistema em tempo real</p>
-        </div>
-        <button class="btn btn--secondary" id="btn-atualizar-log">Atualizar</button>
+        <div><h1 class="section-title">Usuários</h1><p class="section-sub" id="usuarios-sub">Gerencie os acessos ao sistema</p></div>
+        <button class="btn btn--primary" id="btn-novo-usuario">+ Novo Usuário</button>
       </div>
       <div class="card">
-        <div class="log-viewer" id="log-viewer"><span class="log-muted">· carregando...</span></div>
+        <div id="usuarios-vazio" style="text-align:center;padding:40px 0;color:var(--color-gray-400);"><p class="text-sm">Nenhum usuário cadastrado.</p></div>
+        <div id="usuarios-wrapper" style="display:none;overflow-x:auto;">
+          <table class="reconcile-table">
+            <thead><tr><th>Nome</th><th>Papel</th><th>Criado em</th><th class="col-status">Ações</th></tr></thead>
+            <tbody id="usuarios-body"></tbody>
+          </table>
+        </div>
       </div>
+    </section>
+
+    <!-- LOGS -->
+    <section id="section-logs" style="display:none;">
+      <div class="section-header">
+        <div><h1 class="section-title">Log do Motor</h1><p class="section-sub">Eventos do sistema</p></div>
+        <button class="btn btn--secondary" id="btn-atualizar-log">Atualizar</button>
+      </div>
+      <div class="card"><div class="log-viewer" id="log-viewer"><span class="log-muted">· carregando...</span></div></div>
     </section>
 
   </main>
@@ -190,12 +171,11 @@
 <div id="modal-overlay" class="modal-overlay" style="display:none;">
   <div class="modal">
     <div class="modal-header">
-      <span class="modal-title">⛏ Novo Lote de Conciliação</span>
+      <span class="modal-title">⛏ Novo Lote</span>
       <button class="modal-close" id="btn-fechar-modal">✕</button>
     </div>
-
     <div id="modal-passo1">
-      <p class="modal-desc">Dê um nome para identificar este lote (ex: "Fechamento Abril 2026")</p>
+      <p class="modal-desc">Dê um nome para este lote (ex: "Fechamento Abril 2026")</p>
       <div class="form-group">
         <label class="form-label">Nome do Lote</label>
         <input class="form-input" id="input-nome-lote" type="text" placeholder="Fechamento Abril 2026" />
@@ -205,7 +185,6 @@
         <button class="btn btn--primary" id="btn-criar-lote">Criar Lote →</button>
       </div>
     </div>
-
     <div id="modal-passo2" style="display:none;">
       <p class="modal-desc">Adicione os condomínios e envie os arquivos de cada um</p>
       <div id="condominios-lista-modal"></div>
@@ -218,7 +197,7 @@
   </div>
 </div>
 
-<!-- MODAL: RESULTADO CONDOMÍNIO -->
+<!-- MODAL: RESULTADO -->
 <div id="modal-resultado-overlay" class="modal-overlay" style="display:none;">
   <div class="modal modal--lg">
     <div class="modal-header">
@@ -231,16 +210,68 @@
     </div>
     <div style="overflow-x:auto;margin-top:16px;">
       <table class="reconcile-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th class="col-value">Valor Banco</th>
-            <th class="col-value">Valor Sistema</th>
-            <th class="col-status">Status</th>
-          </tr>
-        </thead>
+        <thead><tr><th>ID</th><th class="col-value">Valor Banco</th><th class="col-value">Valor Sistema</th><th class="col-status">Status</th></tr></thead>
         <tbody id="modal-resultado-body"></tbody>
       </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: NOVO USUÁRIO -->
+<div id="modal-usuario-overlay" class="modal-overlay" style="display:none;">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-usuario-titulo">Novo Usuário</span>
+      <button class="modal-close" id="btn-fechar-usuario">✕</button>
+    </div>
+    <p class="modal-desc" id="modal-usuario-desc">Preencha os dados do novo usuário</p>
+    <div class="form-group">
+      <label class="form-label">Nome de usuário</label>
+      <input class="form-input" id="input-novo-nome" type="text" placeholder="joao.silva" />
+    </div>
+    <div class="form-group" style="margin-top:12px;">
+      <label class="form-label">Senha (mín. 6 caracteres)</label>
+      <input class="form-input" id="input-novo-senha" type="password" placeholder="••••••••" />
+    </div>
+    <div class="form-group admin-only" id="grupo-papel" style="margin-top:12px;display:none;">
+      <label class="form-label">Papel</label>
+      <select class="form-input" id="select-papel">
+        <option value="cliente">Cliente</option>
+        <option value="funcionario">Funcionário</option>
+      </select>
+    </div>
+    <p id="erro-usuario" class="erro-msg" style="display:none;"></p>
+    <div class="modal-footer">
+      <button class="btn btn--secondary" id="btn-cancelar-usuario">Cancelar</button>
+      <button class="btn btn--primary" id="btn-salvar-usuario">Criar Usuário</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: PERFIL / TROCAR SENHA -->
+<div id="modal-perfil-overlay" class="modal-overlay" style="display:none;">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">⚙ Meu Perfil</span>
+      <button class="modal-close" id="btn-fechar-perfil">✕</button>
+    </div>
+    <p class="modal-desc">Altere sua senha de acesso</p>
+    <div class="form-group">
+      <label class="form-label">Senha atual</label>
+      <input class="form-input" id="input-senha-atual" type="password" placeholder="••••••••" />
+    </div>
+    <div class="form-group" style="margin-top:12px;">
+      <label class="form-label">Nova senha (mín. 6 caracteres)</label>
+      <input class="form-input" id="input-senha-nova" type="password" placeholder="••••••••" />
+    </div>
+    <div class="form-group" style="margin-top:12px;">
+      <label class="form-label">Confirmar nova senha</label>
+      <input class="form-input" id="input-senha-confirma" type="password" placeholder="••••••••" />
+    </div>
+    <p id="erro-perfil" class="erro-msg" style="display:none;"></p>
+    <div class="modal-footer">
+      <button class="btn btn--secondary" id="btn-cancelar-perfil">Cancelar</button>
+      <button class="btn btn--primary" id="btn-salvar-senha">Salvar Nova Senha</button>
     </div>
   </div>
 </div>
@@ -251,6 +282,7 @@
 <script>
 const state = {
   usuario: null,
+  papel: null,
   loteAtualId: null,
   condominiosModal: [],
   todosRegistros: []
@@ -258,23 +290,31 @@ const state = {
 
 // ── LOGIN ──
 document.getElementById("btn-login").addEventListener("click", fazerLogin);
-document.getElementById("input-senha").addEventListener("keydown", e => { if (e.key === "Enter") fazerLogin(); });
+document.getElementById("input-senha").addEventListener("keydown", e => { if(e.key==="Enter") fazerLogin(); });
 
 async function fazerLogin() {
   const usuario = document.getElementById("input-usuario").value.trim();
   const senha   = document.getElementById("input-senha").value;
   const erroEl  = document.getElementById("erro-login");
   try {
-    const res   = await fetch("/api/login", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({usuario, senha}) });
+    const res   = await fetch("/api/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({usuario,senha})});
     const dados = await res.json();
-    if (dados.ok) {
+    if(dados.ok){
       state.usuario = dados.usuario;
+      state.papel   = dados.papel;
       erroEl.style.display = "none";
       document.getElementById("tela-login").style.display = "none";
       document.getElementById("tela-app").style.display   = "grid";
       document.getElementById("nome-usuario").textContent = dados.usuario;
+      // Mostra aba Usuários apenas para admin e clientes
+      if(dados.papel === "admin" || dados.papel === "cliente"){
+        document.querySelectorAll(".admin-only").forEach(el => el.style.display="");
+        if(dados.papel === "cliente"){
+          document.getElementById("usuarios-sub").textContent = "Gerencie os funcionários da sua conta";
+        }
+      }
       carregarTudo();
-      mostrarToast("Motor Online! Olá, " + dados.usuario + "!", "success");
+      mostrarToast("Bem-vindo, " + dados.usuario + "!", "success");
     } else {
       erroEl.textContent   = dados.erro;
       erroEl.style.display = "block";
@@ -286,11 +326,12 @@ async function fazerLogin() {
   }
 }
 
-function fazerLogout() {
-  fetch("/api/logout", { method:"POST" });
-  state.usuario = null;
+function fazerLogout(){
+  fetch("/api/logout",{method:"POST"});
+  state.usuario = null; state.papel = null;
   document.getElementById("tela-app").style.display   = "none";
   document.getElementById("tela-login").style.display = "flex";
+  document.getElementById("input-senha").value = "";
 }
 document.getElementById("btn-logout").addEventListener("click", fazerLogout);
 document.getElementById("sidebar-logout").addEventListener("click", fazerLogout);
@@ -299,169 +340,205 @@ document.getElementById("sidebar-logout").addEventListener("click", fazerLogout)
 document.querySelectorAll("[data-section]").forEach(el => {
   el.addEventListener("click", () => ativarSecao(el.dataset.section));
 });
-
-function ativarSecao(nome) {
-  ["dashboard","lotes","resultados","logs"].forEach(s => {
-    document.getElementById("section-" + s).style.display = s === nome ? "" : "none";
+function ativarSecao(nome){
+  ["dashboard","lotes","resultados","usuarios","logs"].forEach(s => {
+    document.getElementById("section-"+s).style.display = s===nome?"":"none";
   });
-  document.querySelectorAll("[data-section]").forEach(el => {
-    el.classList.toggle("active", el.dataset.section === nome);
-  });
-  if (nome === "logs") carregarLogs();
+  document.querySelectorAll("[data-section]").forEach(el => el.classList.toggle("active", el.dataset.section===nome));
+  if(nome==="logs") carregarLogs();
+  if(nome==="usuarios") carregarUsuarios();
 }
 
-// ── CARREGAR TUDO ──
-async function carregarTudo() {
-  try {
+// ── DADOS ──
+async function carregarTudo(){
+  try{
     const res   = await fetch("/api/lotes");
     const lotes = await res.json();
     renderizarDashboard(lotes);
     renderizarLotes(lotes);
-    coletarTodosRegistros(lotes);
-  } catch {
-    mostrarToast("Erro ao carregar dados.", "error");
-  }
+    await coletarRegistros(lotes);
+  } catch { mostrarToast("Erro ao carregar dados.","error"); }
 }
 
-// ── DASHBOARD ──
-async function coletarTodosRegistros(lotes) {
+async function coletarRegistros(lotes){
   state.todosRegistros = [];
-  for (const lote of lotes) {
-    for (const cond of lote.condominios) {
-      if (cond.status === "concluido") {
-        try {
+  for(const lote of lotes){
+    for(const cond of lote.condominios){
+      if(cond.status==="concluido"){
+        try{
           const res   = await fetch(`/api/condominios/${cond.id}`);
           const dados = await res.json();
-          (dados.registros || []).forEach(r => {
-            state.todosRegistros.push({ ...r, condominio: cond.nome });
-          });
-        } catch {}
+          (dados.registros||[]).forEach(r => state.todosRegistros.push({...r,condominio:cond.nome}));
+        } catch{}
       }
     }
   }
   renderizarResultados(state.todosRegistros);
 }
 
-function renderizarDashboard(lotes) {
-  const totalLotes     = lotes.length;
-  const totalConds     = lotes.reduce((a, l) => a + l.condominios.length, 0);
-
-  document.getElementById("kpi-lotes").textContent      = totalLotes;
-  document.getElementById("kpi-condominios").textContent = totalConds;
-  document.getElementById("badge-total-lotes").textContent = totalLotes + " lotes";
-
+// ── DASHBOARD ──
+function renderizarDashboard(lotes){
+  document.getElementById("kpi-lotes").textContent       = lotes.length;
+  document.getElementById("kpi-condominios").textContent = lotes.reduce((a,l)=>a+l.condominios.length,0);
+  document.getElementById("badge-total-lotes").textContent = lotes.length+" lotes";
   const lista = document.getElementById("dashboard-lista");
   const vazio = document.getElementById("dashboard-vazio");
+  if(!lotes.length){ vazio.style.display=""; lista.style.display="none"; return; }
+  vazio.style.display="none"; lista.style.display="";
+  lista.innerHTML = lotes.map(lote => lotecardHTML(lote)).join("");
+}
 
-  if (!lotes.length) {
-    vazio.style.display = "";
-    lista.style.display = "none";
-    document.getElementById("kpi-ok").textContent         = "0";
-    document.getElementById("kpi-divergentes").textContent = "0";
-    return;
-  }
-
-  vazio.style.display = "none";
-  lista.style.display = "";
-
-  lista.innerHTML = lotes.map(lote => {
-    const statusBadge = lote.status === "concluido"
-      ? `<span class="badge badge--ok">Concluído</span>`
-      : `<span class="badge badge--warn">Pendente</span>`;
-    const condChips = lote.condominios.map(c => `
-      <div class="cond-chip ${c.status === 'concluido' ? '--ok' : ''}" onclick="verResultado(${c.id}, '${c.nome.replace(/'/g,"\\'")}')">
-        <span class="cond-chip__icon">${c.status === 'concluido' ? '✅' : '⏳'}</span>
-        <span>${c.nome}</span>
-      </div>`).join("");
-    return `
-      <div class="lote-card">
-        <div class="lote-card__header">
-          <div>
-            <div class="lote-card__nome">${lote.nome}</div>
-            <div class="lote-card__meta">${lote.criado_em} · ${lote.condominios.length} condomínio(s)</div>
-          </div>
-          ${statusBadge}
-        </div>
-        <div class="cond-chips">${condChips || '<span class="text-muted text-sm">Nenhum condomínio</span>'}</div>
-      </div>`;
-  }).join("");
+function lotecardHTML(lote){
+  const badge = lote.status==="concluido" ? `<span class="badge badge--ok">Concluído</span>` : `<span class="badge badge--warn">Pendente</span>`;
+  const chips = lote.condominios.map(c=>`
+    <div class="cond-chip ${c.status==='concluido'?'--ok':''}" onclick="verResultado(${c.id},'${c.nome.replace(/'/g,"\\'")}')">
+      <span>${c.status==='concluido'?'✅':'⏳'}</span><span>${c.nome}</span>
+    </div>`).join("") || `<span class="text-muted text-sm">Nenhum condomínio</span>`;
+  return `<div class="lote-card">
+    <div class="lote-card__header">
+      <div><div class="lote-card__nome">${lote.nome}</div><div class="lote-card__meta">${lote.criado_em} · ${lote.condominios.length} condomínio(s)</div></div>
+      ${badge}
+    </div>
+    <div class="cond-chips">${chips}</div>
+  </div>`;
 }
 
 // ── LOTES ──
-function renderizarLotes(lotes) {
+function renderizarLotes(lotes){
   const lista = document.getElementById("lotes-lista");
   const vazio = document.getElementById("lotes-vazio");
-  if (!lotes.length) { vazio.style.display = ""; lista.innerHTML = ""; return; }
-  vazio.style.display = "none";
-  lista.innerHTML = lotes.map(lote => {
-    const statusBadge = lote.status === "concluido"
-      ? `<span class="badge badge--ok">Concluído</span>`
-      : `<span class="badge badge--warn">Pendente</span>`;
-    const condChips = lote.condominios.map(c => `
-      <div class="cond-chip ${c.status === 'concluido' ? '--ok' : ''}" onclick="verResultado(${c.id}, '${c.nome.replace(/'/g,"\\'")}')">
-        <span class="cond-chip__icon">${c.status === 'concluido' ? '✅' : '⏳'}</span>
-        <span>${c.nome}</span>
-      </div>`).join("");
-    return `
-      <div class="lote-card">
-        <div class="lote-card__header">
-          <div>
-            <div class="lote-card__nome">${lote.nome}</div>
-            <div class="lote-card__meta">${lote.criado_em} · ${lote.condominios.length} condomínio(s)</div>
-          </div>
-          ${statusBadge}
-        </div>
-        <div class="cond-chips">${condChips || '<span class="text-muted text-sm">Nenhum condomínio</span>'}</div>
-      </div>`;
-  }).join("");
+  if(!lotes.length){ vazio.style.display=""; lista.innerHTML=""; return; }
+  vazio.style.display="none";
+  lista.innerHTML = lotes.map(lote => lotecardHTML(lote)).join("");
 }
 
 // ── RESULTADOS ──
-function renderizarResultados(registros) {
-  const ok         = registros.filter(r => r.status === "OK").length;
-  const divergentes = registros.filter(r => r.status !== "OK").length;
+function renderizarResultados(registros){
+  const ok  = registros.filter(r=>r.status==="OK").length;
+  const div = registros.filter(r=>r.status!=="OK").length;
   document.getElementById("kpi-ok").textContent          = ok;
-  document.getElementById("kpi-divergentes").textContent = divergentes;
-
-  const tbody  = document.getElementById("resultado-body");
-  const vazio  = document.getElementById("resultado-vazio");
+  document.getElementById("kpi-divergentes").textContent = div;
+  const tbody   = document.getElementById("resultado-body");
+  const vazio   = document.getElementById("resultado-vazio");
   const wrapper = document.getElementById("resultado-wrapper");
-
-  if (!registros.length) {
-    vazio.style.display   = "";
-    wrapper.style.display = "none";
-    return;
-  }
-  vazio.style.display   = "none";
-  wrapper.style.display = "";
-
-  const fmt = v => v != null ? `R$ ${parseFloat(v).toFixed(2).replace(".", ",")}` : "—";
+  if(!registros.length){ vazio.style.display=""; wrapper.style.display="none"; return; }
+  vazio.style.display="none"; wrapper.style.display="";
+  const fmt = v => v!=null ? `R$ ${parseFloat(v).toFixed(2).replace(".",",")}` : "—";
   const badgeMap = {
-    "OK":             `<span class="badge badge--ok">OK</span>`,
-    "DIVERGENTE":     `<span class="badge badge--diverge">Divergente</span>`,
-    "APENAS_BANCO":   `<span class="badge badge--warn">Só Banco</span>`,
-    "APENAS_SISTEMA": `<span class="badge badge--warn">Só Sistema</span>`,
+    "OK":`<span class="badge badge--ok">OK</span>`,
+    "DIVERGENTE":`<span class="badge badge--diverge">Divergente</span>`,
+    "APENAS_BANCO":`<span class="badge badge--warn">Só Banco</span>`,
+    "APENAS_SISTEMA":`<span class="badge badge--warn">Só Sistema</span>`
   };
-
-  tbody.innerHTML = registros.map(r => `
-    <tr>
-      <td>${r.condominio}</td>
-      <td>${r.id}</td>
-      <td class="col-value">${fmt(r.valor_banco)}</td>
-      <td class="col-value">${fmt(r.valor_sistema)}</td>
-      <td class="col-status">${badgeMap[r.status] || r.status}</td>
-    </tr>`).join("");
+  tbody.innerHTML = registros.map(r=>`<tr><td>${r.condominio}</td><td>${r.id}</td><td class="col-value">${fmt(r.valor_banco)}</td><td class="col-value">${fmt(r.valor_sistema)}</td><td class="col-status">${badgeMap[r.status]||r.status}</td></tr>`).join("");
 }
 
-// Filtros de resultados
-document.querySelectorAll(".btn-filtro").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".btn-filtro").forEach(b => b.classList.remove("active"));
+document.querySelectorAll(".btn-filtro").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".btn-filtro").forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
-    const filtro   = btn.dataset.filtro;
-    const filtrados = filtro === "todos" ? state.todosRegistros : state.todosRegistros.filter(r => r.status === filtro);
-    renderizarResultados(filtrados);
+    const f = btn.dataset.filtro;
+    renderizarResultados(f==="todos" ? state.todosRegistros : state.todosRegistros.filter(r=>r.status===f));
   });
+});
+
+// ── USUÁRIOS ──
+async function carregarUsuarios(){
+  try{
+    const res   = await fetch("/api/usuarios");
+    const lista = await res.json();
+    const tbody   = document.getElementById("usuarios-body");
+    const vazio   = document.getElementById("usuarios-vazio");
+    const wrapper = document.getElementById("usuarios-wrapper");
+    if(!lista.length){ vazio.style.display=""; wrapper.style.display="none"; return; }
+    vazio.style.display="none"; wrapper.style.display="";
+    const papelLabel = {"admin":"👑 Admin","cliente":"🏢 Cliente","funcionario":"👤 Funcionário"};
+    tbody.innerHTML = lista.map(u=>`
+      <tr>
+        <td>${u.nome}</td>
+        <td>${papelLabel[u.papel]||u.papel}</td>
+        <td>${u.criado_em||"—"}</td>
+        <td class="col-status">
+          ${u.papel!=="admin"?`<button class="btn btn--danger btn--sm" onclick="removerUsuario(${u.id},'${u.nome}')">Remover</button>`:"—"}
+        </td>
+      </tr>`).join("");
+  } catch { mostrarToast("Erro ao carregar usuários.","error"); }
+}
+
+document.getElementById("btn-novo-usuario").addEventListener("click",()=>{
+  document.getElementById("input-novo-nome").value  = "";
+  document.getElementById("input-novo-senha").value = "";
+  document.getElementById("erro-usuario").style.display = "none";
+  // Mostra seletor de papel só para admin
+  if(state.papel==="admin"){
+    document.getElementById("grupo-papel").style.display = "";
+    document.getElementById("modal-usuario-titulo").textContent = "Novo Usuário";
+    document.getElementById("modal-usuario-desc").textContent   = "Crie um cliente ou funcionário";
+  } else {
+    document.getElementById("grupo-papel").style.display = "none";
+    document.getElementById("modal-usuario-titulo").textContent = "Novo Funcionário";
+    document.getElementById("modal-usuario-desc").textContent   = "Adicione um funcionário à sua conta";
+  }
+  document.getElementById("modal-usuario-overlay").style.display = "flex";
+});
+
+document.getElementById("btn-fechar-usuario").addEventListener("click",()=>{ document.getElementById("modal-usuario-overlay").style.display="none"; });
+document.getElementById("btn-cancelar-usuario").addEventListener("click",()=>{ document.getElementById("modal-usuario-overlay").style.display="none"; });
+
+document.getElementById("btn-salvar-usuario").addEventListener("click", async ()=>{
+  const nome  = document.getElementById("input-novo-nome").value.trim();
+  const senha = document.getElementById("input-novo-senha").value.trim();
+  const papel = state.papel==="admin" ? document.getElementById("select-papel").value : "funcionario";
+  const erroEl = document.getElementById("erro-usuario");
+  if(!nome||!senha){ erroEl.textContent="Preencha todos os campos."; erroEl.style.display="block"; return; }
+  const res   = await fetch("/api/usuarios",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({nome,senha,papel})});
+  const dados = await res.json();
+  if(dados.ok){
+    document.getElementById("modal-usuario-overlay").style.display="none";
+    mostrarToast(`Usuário "${nome}" criado!`,"success");
+    carregarUsuarios();
+  } else {
+    erroEl.textContent   = dados.erro;
+    erroEl.style.display = "block";
+  }
+});
+
+async function removerUsuario(id, nome){
+  if(!confirm(`Remover o usuário "${nome}"? Esta ação não pode ser desfeita.`)) return;
+  const res = await fetch(`/api/usuarios/${id}`,{method:"DELETE"});
+  const d   = await res.json();
+  if(d.ok){ mostrarToast(`"${nome}" removido.`,"success"); carregarUsuarios(); }
+  else mostrarToast(d.erro,"error");
+}
+
+// ── PERFIL / TROCAR SENHA ──
+document.getElementById("btn-perfil").addEventListener("click",()=>{
+  document.getElementById("input-senha-atual").value    = "";
+  document.getElementById("input-senha-nova").value     = "";
+  document.getElementById("input-senha-confirma").value = "";
+  document.getElementById("erro-perfil").style.display  = "none";
+  document.getElementById("modal-perfil-overlay").style.display = "flex";
+});
+document.getElementById("btn-fechar-perfil").addEventListener("click",()=>{ document.getElementById("modal-perfil-overlay").style.display="none"; });
+document.getElementById("btn-cancelar-perfil").addEventListener("click",()=>{ document.getElementById("modal-perfil-overlay").style.display="none"; });
+
+document.getElementById("btn-salvar-senha").addEventListener("click", async ()=>{
+  const atual     = document.getElementById("input-senha-atual").value;
+  const nova      = document.getElementById("input-senha-nova").value;
+  const confirma  = document.getElementById("input-senha-confirma").value;
+  const erroEl    = document.getElementById("erro-perfil");
+  if(!atual||!nova||!confirma){ erroEl.textContent="Preencha todos os campos."; erroEl.style.display="block"; return; }
+  if(nova!==confirma){ erroEl.textContent="A nova senha e a confirmação não coincidem."; erroEl.style.display="block"; return; }
+  if(nova.length<6){ erroEl.textContent="A nova senha deve ter ao menos 6 caracteres."; erroEl.style.display="block"; return; }
+  const res   = await fetch("/api/trocar-senha",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({senha_atual:atual,senha_nova:nova})});
+  const dados = await res.json();
+  if(dados.ok){
+    document.getElementById("modal-perfil-overlay").style.display="none";
+    mostrarToast("Senha alterada com sucesso!","success");
+  } else {
+    erroEl.textContent   = dados.erro;
+    erroEl.style.display = "block";
+  }
 });
 
 // ── MODAL NOVO LOTE ──
@@ -470,194 +547,145 @@ document.getElementById("btn-fechar-modal").addEventListener("click", fecharModa
 document.getElementById("btn-cancelar-lote").addEventListener("click", fecharModal);
 document.getElementById("btn-cancelar-lote2").addEventListener("click", fecharModal);
 
-function abrirModalLote() {
-  state.loteAtualId = null;
-  state.condominiosModal = [];
+function abrirModalLote(){
+  state.loteAtualId = null; state.condominiosModal = [];
   document.getElementById("input-nome-lote").value = "";
   document.getElementById("condominios-lista-modal").innerHTML = "";
   document.getElementById("modal-passo1").style.display = "";
   document.getElementById("modal-passo2").style.display = "none";
   document.getElementById("modal-overlay").style.display = "flex";
 }
+function fecharModal(){ document.getElementById("modal-overlay").style.display="none"; carregarTudo(); }
 
-function fecharModal() {
-  document.getElementById("modal-overlay").style.display = "none";
-  carregarTudo();
-}
-
-document.getElementById("btn-criar-lote").addEventListener("click", async () => {
+document.getElementById("btn-criar-lote").addEventListener("click", async ()=>{
   const nome = document.getElementById("input-nome-lote").value.trim();
-  if (!nome) { mostrarToast("Digite o nome do lote.", "error"); return; }
-  const res   = await fetch("/api/lotes", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({nome}) });
+  if(!nome){ mostrarToast("Digite o nome do lote.","error"); return; }
+  const res   = await fetch("/api/lotes",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({nome})});
   const dados = await res.json();
-  if (!dados.ok) { mostrarToast("Erro ao criar lote.", "error"); return; }
+  if(!dados.ok){ mostrarToast("Erro ao criar lote.","error"); return; }
   state.loteAtualId = dados.id;
   document.getElementById("modal-passo1").style.display = "none";
   document.getElementById("modal-passo2").style.display = "";
-  mostrarToast(`Lote "${nome}" criado!`, "success");
+  mostrarToast(`Lote "${nome}" criado!`,"success");
 });
 
-document.getElementById("btn-add-condominio").addEventListener("click", () => {
-  const id = Date.now();
-  state.condominiosModal.push({ tempId: id, condId: null, nome: "", uploadFeito: false });
+document.getElementById("btn-add-condominio").addEventListener("click",()=>{
+  state.condominiosModal.push({tempId:Date.now(),condId:null,nome:"",uploadFeito:false});
   renderizarCondominiosModal();
 });
 
-function renderizarCondominiosModal() {
-  const container = document.getElementById("condominios-lista-modal");
-  container.innerHTML = state.condominiosModal.map((c, idx) => `
-    <div class="cond-form" id="cond-form-${c.tempId}">
+function renderizarCondominiosModal(){
+  document.getElementById("condominios-lista-modal").innerHTML = state.condominiosModal.map((c,i)=>`
+    <div class="cond-form">
       <div class="cond-form__header">
-        <span class="cond-form__num">🏢 Condomínio ${idx + 1}</span>
-        <button class="btn btn--ghost btn--sm" onclick="removerCondominio(${c.tempId})">✕ Remover</button>
+        <span class="cond-form__num">🏢 Condomínio ${i+1}</span>
+        <button class="btn btn--ghost btn--sm" onclick="removerCond(${c.tempId})">✕</button>
       </div>
       <div class="form-group">
-        <label class="form-label">Nome do Condomínio</label>
-        <input class="form-input" id="nome-cond-${c.tempId}" type="text" placeholder="Ex: Condomínio Solar" value="${c.nome}" onchange="atualizarNomeCond(${c.tempId}, this.value)" />
+        <label class="form-label">Nome</label>
+        <input class="form-input" id="nome-cond-${c.tempId}" type="text" placeholder="Ex: Condomínio Solar" value="${c.nome}" onchange="atualizarNomeCond(${c.tempId},this.value)" />
       </div>
       <div class="upload-duo" style="margin-top:12px;">
-        <div class="upload-slot" id="slot-banco-${c.tempId}">
+        <div class="upload-slot">
           <label class="upload-slot__label">🏦 Extrato do Banco<span class="upload-slot__ext">CSV · XLSX · PDF</span></label>
-          <input type="file" id="file-banco-${c.tempId}" accept=".csv,.xlsx,.xls,.pdf" style="display:none;" onchange="marcarArquivo(${c.tempId}, 'banco', this)" />
-          <button class="btn btn--secondary btn--sm" onclick="document.getElementById('file-banco-${c.tempId}').click()">Selecionar arquivo</button>
+          <input type="file" id="file-banco-${c.tempId}" accept=".csv,.xlsx,.xls,.pdf" style="display:none;" onchange="marcarArq(${c.tempId},'banco',this)" />
+          <button class="btn btn--secondary btn--sm" onclick="document.getElementById('file-banco-${c.tempId}').click()">Selecionar</button>
           <span class="upload-slot__nome" id="nome-banco-${c.tempId}"></span>
         </div>
-        <div class="upload-slot" id="slot-sistema-${c.tempId}">
+        <div class="upload-slot">
           <label class="upload-slot__label">🏢 Relatório do Sistema<span class="upload-slot__ext">CSV · XLSX · PDF</span></label>
-          <input type="file" id="file-sistema-${c.tempId}" accept=".csv,.xlsx,.xls,.pdf" style="display:none;" onchange="marcarArquivo(${c.tempId}, 'sistema', this)" />
-          <button class="btn btn--secondary btn--sm" onclick="document.getElementById('file-sistema-${c.tempId}').click()">Selecionar arquivo</button>
+          <input type="file" id="file-sistema-${c.tempId}" accept=".csv,.xlsx,.xls,.pdf" style="display:none;" onchange="marcarArq(${c.tempId},'sistema',this)" />
+          <button class="btn btn--secondary btn--sm" onclick="document.getElementById('file-sistema-${c.tempId}').click()">Selecionar</button>
           <span class="upload-slot__nome" id="nome-sistema-${c.tempId}"></span>
         </div>
       </div>
-      <button class="btn btn--primary btn--sm" style="margin-top:10px;" onclick="enviarArquivosCond(${c.tempId})">✓ Confirmar arquivos</button>
-      <span class="cond-confirmado" id="confirmado-${c.tempId}" style="display:none;">✅ Arquivos confirmados!</span>
+      <button class="btn btn--primary btn--sm" style="margin-top:10px;" onclick="enviarArqCond(${c.tempId})">✓ Confirmar arquivos</button>
+      <span id="confirmado-${c.tempId}" style="display:none;font-size:12px;color:var(--color-success);margin-left:8px;">✅ Confirmado!</span>
     </div>`).join("");
 }
 
-function atualizarNomeCond(tempId, nome) {
-  const c = state.condominiosModal.find(x => x.tempId === tempId);
-  if (c) c.nome = nome;
-}
+function atualizarNomeCond(id,nome){ const c=state.condominiosModal.find(x=>x.tempId===id); if(c) c.nome=nome; }
+function marcarArq(id,tipo,input){ document.getElementById(`nome-${tipo}-${id}`).textContent=input.files[0]?.name||""; }
+function removerCond(id){ state.condominiosModal=state.condominiosModal.filter(c=>c.tempId!==id); renderizarCondominiosModal(); }
 
-function marcarArquivo(tempId, tipo, input) {
-  document.getElementById(`nome-${tipo}-${tempId}`).textContent = input.files[0]?.name || "";
-}
-
-function removerCondominio(tempId) {
-  state.condominiosModal = state.condominiosModal.filter(c => c.tempId !== tempId);
-  renderizarCondominiosModal();
-}
-
-async function enviarArquivosCond(tempId) {
-  const c      = state.condominiosModal.find(x => x.tempId === tempId);
-  const nome   = document.getElementById(`nome-cond-${tempId}`).value.trim();
-  const fBanco = document.getElementById(`file-banco-${tempId}`).files[0];
-  const fSist  = document.getElementById(`file-sistema-${tempId}`).files[0];
-
-  if (!nome)   { mostrarToast("Digite o nome do condomínio.", "error"); return; }
-  if (!fBanco) { mostrarToast("Selecione o extrato do banco.", "error"); return; }
-  if (!fSist)  { mostrarToast("Selecione o relatório do sistema.", "error"); return; }
-
-  if (!c.condId) {
-    const formNome = new FormData();
-    formNome.append("nome", nome);
-    const res   = await fetch(`/api/lotes/${state.loteAtualId}/condominios`, { method:"POST", body: formNome });
-    const dados = await res.json();
-    if (!dados.ok) { mostrarToast("Erro ao criar condomínio.", "error"); return; }
-    c.condId = dados.id;
-    c.nome   = nome;
+async function enviarArqCond(tempId){
+  const c     = state.condominiosModal.find(x=>x.tempId===tempId);
+  const nome  = document.getElementById(`nome-cond-${tempId}`).value.trim();
+  const fB    = document.getElementById(`file-banco-${tempId}`).files[0];
+  const fS    = document.getElementById(`file-sistema-${tempId}`).files[0];
+  if(!nome){ mostrarToast("Digite o nome do condomínio.","error"); return; }
+  if(!fB)  { mostrarToast("Selecione o extrato do banco.","error"); return; }
+  if(!fS)  { mostrarToast("Selecione o relatório do sistema.","error"); return; }
+  if(!c.condId){
+    const fd = new FormData(); fd.append("nome",nome);
+    const r  = await fetch(`/api/lotes/${state.loteAtualId}/condominios`,{method:"POST",body:fd});
+    const d  = await r.json();
+    if(!d.ok){ mostrarToast("Erro ao criar condomínio.","error"); return; }
+    c.condId=d.id; c.nome=nome;
   }
-
   const form = new FormData();
-  form.append("arquivo_banco",   fBanco);
-  form.append("arquivo_sistema", fSist);
-  const res2 = await fetch(`/api/condominios/${c.condId}/upload`, { method:"POST", body: form });
-  const d2   = await res2.json();
-  if (!d2.ok) { mostrarToast("Erro no upload: " + d2.erro, "error"); return; }
-
-  c.uploadFeito = true;
-  document.getElementById(`confirmado-${tempId}`).style.display = "";
-  mostrarToast(`"${nome}" pronto!`, "success");
+  form.append("arquivo_banco",fB); form.append("arquivo_sistema",fS);
+  const r2 = await fetch(`/api/condominios/${c.condId}/upload`,{method:"POST",body:form});
+  const d2 = await r2.json();
+  if(!d2.ok){ mostrarToast("Erro: "+d2.erro,"error"); return; }
+  c.uploadFeito=true;
+  document.getElementById(`confirmado-${tempId}`).style.display="";
+  mostrarToast(`"${nome}" pronto!`,"success");
 }
 
-document.getElementById("btn-processar-lote").addEventListener("click", async () => {
-  const prontos = state.condominiosModal.filter(c => c.uploadFeito);
-  if (!prontos.length) { mostrarToast("Confirme os arquivos de pelo menos um condomínio.", "error"); return; }
+document.getElementById("btn-processar-lote").addEventListener("click", async ()=>{
+  if(!state.condominiosModal.filter(c=>c.uploadFeito).length){ mostrarToast("Confirme pelo menos um condomínio.","error"); return; }
   const btn = document.getElementById("btn-processar-lote");
-  btn.disabled    = true;
-  btn.textContent = "⛏ Processando com IA...";
-  try {
-    const res   = await fetch(`/api/lotes/${state.loteAtualId}/processar`, { method:"POST" });
+  btn.disabled=true; btn.textContent="⛏ Processando...";
+  try{
+    const res   = await fetch(`/api/lotes/${state.loteAtualId}/processar`,{method:"POST"});
     const dados = await res.json();
-    if (!dados.ok) { mostrarToast("Erro: " + dados.erro, "error"); btn.disabled = false; btn.textContent = "⛏ Processar com IA"; return; }
+    if(!dados.ok){ mostrarToast("Erro: "+dados.erro,"error"); btn.disabled=false; btn.textContent="⛏ Processar com IA"; return; }
     fecharModal();
-    mostrarToast("Lote processado com sucesso!", "success");
-  } catch {
-    mostrarToast("Erro de conexão.", "error");
-    btn.disabled    = false;
-    btn.textContent = "⛏ Processar com IA";
-  }
+    mostrarToast("Lote processado com sucesso!","success");
+  } catch { mostrarToast("Erro de conexão.","error"); btn.disabled=false; btn.textContent="⛏ Processar com IA"; }
 });
 
 // ── MODAL RESULTADO ──
-document.getElementById("btn-fechar-resultado").addEventListener("click", () => {
-  document.getElementById("modal-resultado-overlay").style.display = "none";
-});
+document.getElementById("btn-fechar-resultado").addEventListener("click",()=>{ document.getElementById("modal-resultado-overlay").style.display="none"; });
 
-async function verResultado(condId, nome) {
+async function verResultado(condId,nome){
   const res   = await fetch(`/api/condominios/${condId}`);
   const dados = await res.json();
-  if (dados.erro) { mostrarToast(dados.erro, "error"); return; }
-
-  document.getElementById("modal-resultado-titulo").textContent = "📊 " + nome;
-  document.getElementById("modal-analise-ia").textContent       = dados.analise_ia || "Sem análise disponível.";
-
-  const fmt = v => v != null ? `R$ ${parseFloat(v).toFixed(2).replace(".", ",")}` : "—";
-  const badgeMap = {
-    "OK":             `<span class="badge badge--ok">OK</span>`,
-    "DIVERGENTE":     `<span class="badge badge--diverge">Divergente</span>`,
-    "APENAS_BANCO":   `<span class="badge badge--warn">Só Banco</span>`,
-    "APENAS_SISTEMA": `<span class="badge badge--warn">Só Sistema</span>`,
-  };
-
-  document.getElementById("modal-resultado-body").innerHTML = (dados.registros || []).map(r => `
-    <tr>
-      <td>${r.id}</td>
-      <td class="col-value">${fmt(r.valor_banco)}</td>
-      <td class="col-value">${fmt(r.valor_sistema)}</td>
-      <td class="col-status">${badgeMap[r.status] || r.status}</td>
-    </tr>`).join("");
-
-  document.getElementById("modal-resultado-overlay").style.display = "flex";
+  if(dados.erro){ mostrarToast(dados.erro,"error"); return; }
+  document.getElementById("modal-resultado-titulo").textContent = "📊 "+nome;
+  document.getElementById("modal-analise-ia").textContent       = dados.analise_ia||"Sem análise.";
+  const fmt = v => v!=null?`R$ ${parseFloat(v).toFixed(2).replace(".",",")}`:"—";
+  const bm  = {"OK":`<span class="badge badge--ok">OK</span>`,"DIVERGENTE":`<span class="badge badge--diverge">Divergente</span>`,"APENAS_BANCO":`<span class="badge badge--warn">Só Banco</span>`,"APENAS_SISTEMA":`<span class="badge badge--warn">Só Sistema</span>`};
+  document.getElementById("modal-resultado-body").innerHTML = (dados.registros||[]).map(r=>`<tr><td>${r.id}</td><td class="col-value">${fmt(r.valor_banco)}</td><td class="col-value">${fmt(r.valor_sistema)}</td><td class="col-status">${bm[r.status]||r.status}</td></tr>`).join("");
+  document.getElementById("modal-resultado-overlay").style.display="flex";
 }
 
 // ── LOGS ──
 document.getElementById("btn-atualizar-log").addEventListener("click", carregarLogs);
-async function carregarLogs() {
-  try {
+async function carregarLogs(){
+  try{
     const res   = await fetch("/api/logs");
     const dados = await res.json();
     const viewer = document.getElementById("log-viewer");
-    viewer.innerHTML = dados.linhas.map(linha => {
-      let cls = "log-info";
-      if (linha.includes("[ERROR]"))   cls = "log-error";
-      else if (linha.includes("[WARNING]")) cls = "log-warn";
-      else if (linha.includes("[INFO]"))    cls = "log-ok";
-      return `<div><span class="${cls}">${linha}</span></div>`;
+    viewer.innerHTML = dados.linhas.map(l=>{
+      let cls="log-info";
+      if(l.includes("[ERROR]")) cls="log-error";
+      else if(l.includes("[WARNING]")) cls="log-warn";
+      else if(l.includes("[INFO]")) cls="log-ok";
+      return `<div><span class="${cls}">${l}</span></div>`;
     }).join("");
-    viewer.scrollTop = viewer.scrollHeight;
-  } catch { mostrarToast("Erro ao carregar logs.", "error"); }
+    viewer.scrollTop=viewer.scrollHeight;
+  } catch { mostrarToast("Erro ao carregar logs.","error"); }
 }
 
 // ── TOAST ──
-let toastTimer = null;
-function mostrarToast(msg, tipo = "success") {
-  const t = document.getElementById("toast");
-  t.className     = `toast toast--${tipo}`;
-  t.textContent   = msg;
-  t.style.display = "flex";
-  if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { t.style.display = "none"; }, 3500);
+let toastTimer=null;
+function mostrarToast(msg,tipo="success"){
+  const t=document.getElementById("toast");
+  t.className=`toast toast--${tipo}`; t.textContent=msg; t.style.display="flex";
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>{ t.style.display="none"; },3500);
 }
 </script>
 </body>
