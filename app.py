@@ -30,11 +30,17 @@ for pasta in [PASTA_UPLOADS, PASTA_RELATORIOS]:
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "mineirinho-v3-chave-secreta-local")
 
+@app.errorhandler(Exception)
+def handle_exception(e):
+    log.error("Erro não tratado: %s", e, exc_info=True)
+    return jsonify({"erro": str(e)}), 500
+
 # ---------------------------------------------------------------------------
 # BANCO DE DADOS
 # ---------------------------------------------------------------------------
 
 def configurar_banco() -> None:
+    """Configura o banco verificando e migrando schema se necessário.""" 
     with sqlite3.connect(DB_PATH) as conn:
         # Usuários com papel (admin / cliente / funcionario)
         conn.execute("""
@@ -51,12 +57,13 @@ def configurar_banco() -> None:
         colunas = [r[1] for r in conn.execute("PRAGMA table_info(usuarios)").fetchall()]
         if "papel" not in colunas:
             conn.execute("ALTER TABLE usuarios ADD COLUMN papel TEXT DEFAULT 'cliente'")
-            conn.execute("UPDATE usuarios SET papel='admin' WHERE nome=?",
-                         (os.environ.get("ADMIN_USER","arthur"),))
         if "dono_id" not in colunas:
             conn.execute("ALTER TABLE usuarios ADD COLUMN dono_id INTEGER")
         if "criado_em" not in colunas:
             conn.execute("ALTER TABLE usuarios ADD COLUMN criado_em TEXT")
+        # Garante que o admin sempre tem papel correto
+        admin = os.environ.get("ADMIN_USER", "arthur")
+        conn.execute("UPDATE usuarios SET papel='admin' WHERE nome=?", (admin,))
 
         # Lotes vinculados a um usuário
         conn.execute("""
@@ -361,52 +368,62 @@ def remover_usuario(uid):
 
 @app.route("/api/lotes", methods=["GET"])
 def listar_lotes():
-    u = usuario_logado()
-    if not u:
-        return jsonify({"erro":"Não autenticado."}), 401
+    try:
+        u = usuario_logado()
+        if not u:
+            return jsonify({"erro":"Não autenticado."}), 401
 
-    ids = ids_visiveis(u)
-    placeholders = ",".join("?" * len(ids))
+        ids = ids_visiveis(u)
+        if not ids:
+            return jsonify([])
 
-    with sqlite3.connect(DB_PATH) as conn:
-        conn.row_factory = sqlite3.Row
-        lotes = conn.execute(
-            f"SELECT * FROM lotes WHERE usuario_id IN ({placeholders}) ORDER BY criado_em DESC", ids
-        ).fetchall()
-        resultado = []
-        for lote in lotes:
-            conds = conn.execute(
-                "SELECT id,nome,status FROM condominios WHERE lote_id=?", (lote["id"],)
+        placeholders = ",".join("?" * len(ids))
+
+        with sqlite3.connect(DB_PATH) as conn:
+            conn.row_factory = sqlite3.Row
+            lotes = conn.execute(
+                f"SELECT * FROM lotes WHERE usuario_id IN ({placeholders}) ORDER BY criado_em DESC", ids
             ).fetchall()
-            resultado.append({
-                "id": lote["id"], "nome": lote["nome"],
-                "criado_em": lote["criado_em"], "status": lote["status"],
-                "condominios": [dict(c) for c in conds]
-            })
-    return jsonify(resultado)
+            resultado = []
+            for lote in lotes:
+                conds = conn.execute(
+                    "SELECT id,nome,status FROM condominios WHERE lote_id=?", (lote["id"],)
+                ).fetchall()
+                resultado.append({
+                    "id": lote["id"], "nome": lote["nome"],
+                    "criado_em": lote["criado_em"], "status": lote["status"],
+                    "condominios": [dict(c) for c in conds]
+                })
+        return jsonify(resultado)
+    except Exception as e:
+        log.error("Erro listar_lotes: %s", e, exc_info=True)
+        return jsonify({"erro": str(e)}), 500
 
 
 @app.route("/api/lotes", methods=["POST"])
 def criar_lote():
-    u = usuario_logado()
-    if not u:
-        return jsonify({"erro":"Não autenticado."}), 401
-    d    = request.get_json()
-    nome = d.get("nome","").strip()
-    if not nome:
-        return jsonify({"erro":"Nome obrigatório."}), 400
+    try:
+        u = usuario_logado()
+        if not u:
+            return jsonify({"erro":"Não autenticado."}), 401
+        d    = request.get_json()
+        nome = d.get("nome","").strip()
+        if not nome:
+            return jsonify({"erro":"Nome obrigatório."}), 400
 
-    # Funcionário cria lote em nome do dono (cliente)
-    uid = u["dono_id"] if u["papel"] == "funcionario" else u["id"]
-    agora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        uid = u["dono_id"] if u["papel"] == "funcionario" else u["id"]
+        agora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    with sqlite3.connect(DB_PATH) as conn:
-        cur = conn.execute(
-            "INSERT INTO lotes (nome, criado_em, usuario_id) VALUES (?,?,?)", (nome, agora, uid)
-        )
-        lote_id = cur.lastrowid
-        conn.commit()
-    return jsonify({"ok":True,"id":lote_id,"nome":nome})
+        with sqlite3.connect(DB_PATH) as conn:
+            cur = conn.execute(
+                "INSERT INTO lotes (nome, criado_em, usuario_id) VALUES (?,?,?)", (nome, agora, uid)
+            )
+            lote_id = cur.lastrowid
+            conn.commit()
+        return jsonify({"ok":True,"id":lote_id,"nome":nome})
+    except Exception as e:
+        log.error("Erro criar_lote: %s", e, exc_info=True)
+        return jsonify({"ok":False,"erro": str(e)}), 500
 
 
 @app.route("/api/lotes/<int:lote_id>/condominios", methods=["POST"])
