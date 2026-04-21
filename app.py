@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 
 PASTA_UPLOADS    = Path("./uploads")
 PASTA_RELATORIOS = Path("./relatorios_triade")
-DB_PATH          = Path("motor_seguro_v3.db")
+DB_PATH          = Path("motor_seguro.db")
 EXTENSOES_VALIDAS = {"csv", "xlsx", "xls", "pdf"}
 
 for pasta in [PASTA_UPLOADS, PASTA_RELATORIOS]:
@@ -151,45 +151,261 @@ def ids_visiveis(u) -> list:
 # LEITURA DE ARQUIVOS
 # ---------------------------------------------------------------------------
 
+def _limpar_valor(v) -> float:
+    """Converte string brasileira de valor para float. Ex: '1.199,00' -> 1199.0"""
+    if v is None or str(v).strip() in ('', '-', 'None', 'nan'):
+        return 0.0
+    s = str(v).strip()
+    # Remove R$, espaços e pontos de milhar, troca vírgula por ponto
+    s = s.replace('R$', '').replace(' ', '').replace('.', '').replace(',', '.')
+    try:
+        return abs(float(s))
+    except:
+        return 0.0
+
+
+def _detectar_formato(df: pd.DataFrame) -> str:
+    """
+    Detecta se o DataFrame é formato simples (id+valor) ou extrato real (data+descrição+valores).
+    Retorna 'simples' ou 'extrato'.
+    """
+    colunas = [c.lower().strip() for c in df.columns]
+    if 'id' in colunas and 'valor' in colunas:
+        return 'simples'
+    # Detecta colunas de extrato bancário ou relatório de condomínio
+    tem_data = any('data' in c for c in colunas)
+    tem_valor = any(c in colunas for c in ['crédito (r$)', 'credito', 'r$ receita', 'receita', 'débito (r$)', 'debito', 'r$ despesa', 'despesa'])
+    if tem_data and tem_valor:
+        return 'extrato'
+    return 'simples'
+
+
+def _normalizar_extrato(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Normaliza um DataFrame de extrato real para o formato padrão:
+    id (data+seq), descricao, valor_entrada, valor_saida, valor_liquido
+    """
+    colunas = {c.lower().strip(): c for c in df.columns}
+    
+    # Encontra coluna de data
+    col_data = next((colunas[c] for c in colunas if 'data' in c), None)
+    
+    # Encontra coluna de descrição
+    col_desc = next((colunas[c] for c in colunas if any(x in c for x in ['descrição', 'descricao', 'lançamento', 'lancamento', 'histórico', 'historico'])), None)
+    
+    # Encontra colunas de valores
+    col_credito = next((colunas[c] for c in colunas if any(x in c for x in ['crédito', 'credito', 'receita', 'entrada'])), None)
+    col_debito  = next((colunas[c] for c in colunas if any(x in c for x in ['débito', 'debito', 'despesa', 'saída', 'saida'])), None)
+
+    rows = []
+    contador = {}
+    for _, row in df.iterrows():
+        data = str(row[col_data]).strip() if col_data else ''
+        desc = str(row[col_desc]).strip() if col_desc else ''
+        
+        # Ignora linhas vazias, totais e saldos
+        if not data or data.lower() in ('none', 'nan', '', 'data') or            any(x in desc.lower() for x in ['total', 'saldo anterior', 'saldo invest', 'saldo']):
+            continue
+        
+        entrada = _limpar_valor(row[col_credito]) if col_credito else 0.0
+        saida   = _limpar_valor(row[col_debito])  if col_debito  else 0.0
+        liquido = entrada - saida
+
+        # Gera ID único: data + contador
+        contador[data] = contador.get(data, 0) + 1
+        id_unico = f"{data}_{contador[data]:02d}"
+
+        rows.append({
+            'id': id_unico,
+            'data': data,
+            'descricao': desc,
+            'valor_entrada': entrada,
+            'valor_saida': saida,
+            'valor': liquido
+        })
+
+    return pd.DataFrame(rows)
+
+
 def ler_arquivo(caminho: Path) -> pd.DataFrame:
+    """
+    Lê arquivo CSV, XLSX ou PDF e retorna DataFrame normalizado.
+    
+    Suporta dois formatos:
+    - Simples: colunas 'id' e 'valor' (CSV/XLSX manuais)
+    - Extrato: formato real de banco ou sistema de condomínio com data, descrição, crédito/débito
+    """
     ext = caminho.suffix.lower()
+
     if ext == ".csv":
-        return pd.read_csv(caminho, dtype=str)
-    if ext in {".xlsx", ".xls"}:
-        return pd.read_excel(caminho, dtype=str)
-    if ext == ".pdf":
+        df = pd.read_csv(caminho, dtype=str)
+    elif ext in {".xlsx", ".xls"}:
+        df = pd.read_excel(caminho, dtype=str)
+    elif ext == ".pdf":
+        todas_linhas = []
+        cabecalho = None
         with pdfplumber.open(caminho) as pdf:
             for page in pdf.pages:
                 tabela = page.extract_table()
                 if tabela:
-                    cab = [str(c).strip().lower() for c in tabela[0]]
-                    return pd.DataFrame(tabela[1:], columns=cab, dtype=str)
-        raise ValueError("Nenhuma tabela encontrada no PDF.")
-    raise ValueError(f"Extensão não suportada: {ext}")
+                    if cabecalho is None:
+                        cabecalho = [str(c).strip() if c else '' for c in tabela[0]]
+                        todas_linhas.extend(tabela[1:])
+                    else:
+                        # Continua tabela em páginas seguintes
+                        for row in tabela:
+                            if row and str(row[0]).strip() not in (cabecalho[0], '', 'None'):
+                                todas_linhas.append(row)
+        if not cabecalho:
+            raise ValueError("Nenhuma tabela encontrada no PDF.")
+        df = pd.DataFrame(todas_linhas, columns=cabecalho, dtype=str)
+    else:
+        raise ValueError(f"Extensão não suportada: {ext}")
+
+    # Detecta formato e normaliza
+    fmt = _detectar_formato(df)
+    if fmt == 'extrato':
+        return _normalizar_extrato(df)
+    
+    # Formato simples — garante que valor é numérico
+    df['valor'] = df['valor'].apply(_limpar_valor)
+    return df
 
 # ---------------------------------------------------------------------------
 # CONCILIAÇÃO
 # ---------------------------------------------------------------------------
 
 def conciliar(df_banco, df_sistema) -> list:
-    df_banco["valor"]   = pd.to_numeric(df_banco["valor"],   errors="coerce")
+    """
+    Concilia dois DataFrames inteligentemente.
+    
+    Se ambos têm formato de extrato (com data e descrição):
+      - Cruza por data + valor líquido
+      - Gera ID automático baseado na data
+    
+    Se formato simples (id + valor):
+      - Cruza pelo campo 'id' diretamente
+    
+    Sempre retorna lista com: id, descricao, valor_banco, valor_sistema, status
+    """
+    tem_extrato_banco  = 'data' in df_banco.columns and 'descricao' in df_banco.columns
+    tem_extrato_sistema = 'data' in df_sistema.columns and 'descricao' in df_sistema.columns
+
+    if tem_extrato_banco and tem_extrato_sistema:
+        return _conciliar_extrato(df_banco, df_sistema)
+    else:
+        return _conciliar_simples(df_banco, df_sistema)
+
+
+def _conciliar_simples(df_banco, df_sistema) -> list:
+    """Conciliação por campo 'id' — formato CSV/XLSX simples."""
+    df_banco["valor"]   = pd.to_numeric(df_banco["valor"], errors="coerce")
     df_sistema["valor"] = pd.to_numeric(df_sistema["valor"], errors="coerce")
     df_banco   = df_banco.rename(columns={"valor": "valor_banco"})
     df_sistema = df_sistema.rename(columns={"valor": "valor_sistema"})
-    merged = pd.merge(df_banco, df_sistema, on="id", how="outer")
+    merged = pd.merge(df_banco[['id','valor_banco']], df_sistema[['id','valor_sistema']], on="id", how="outer")
     registros = []
     for _, row in merged.iterrows():
         vb, vs = row.get("valor_banco"), row.get("valor_sistema")
-        if pd.isna(vb):       status = "APENAS_SISTEMA"
-        elif pd.isna(vs):     status = "APENAS_BANCO"
+        if pd.isna(vb):                        status = "APENAS_SISTEMA"
+        elif pd.isna(vs):                      status = "APENAS_BANCO"
         elif abs(float(vb)-float(vs)) < 0.01: status = "OK"
-        else:                 status = "DIVERGENTE"
+        else:                                  status = "DIVERGENTE"
         registros.append({
             "id": row["id"],
+            "descricao": "",
             "valor_banco":   None if pd.isna(vb) else float(vb),
             "valor_sistema": None if pd.isna(vs) else float(vs),
             "status": status
         })
+    return registros
+
+
+def _conciliar_extrato(df_banco, df_sistema) -> list:
+    """
+    Conciliação de extratos reais por data + valor.
+    Agrupa lançamentos do mesmo dia e compara totais.
+    Lançamentos sem par são marcados como APENAS_BANCO ou APENAS_SISTEMA.
+    """
+    registros = []
+
+    # Agrupa banco por data
+    banco_por_data = {}
+    for _, row in df_banco.iterrows():
+        data = str(row.get('data', '')).strip()
+        if not data or data == 'nan':
+            continue
+        if data not in banco_por_data:
+            banco_por_data[data] = []
+        banco_por_data[data].append({
+            'id': row.get('id', ''),
+            'descricao': str(row.get('descricao', '')),
+            'valor': float(row.get('valor', 0) or 0),
+            'entrada': float(row.get('valor_entrada', 0) or 0),
+            'saida': float(row.get('valor_saida', 0) or 0),
+        })
+
+    # Agrupa sistema por data
+    sistema_por_data = {}
+    for _, row in df_sistema.iterrows():
+        data = str(row.get('data', '')).strip()
+        if not data or data == 'nan':
+            continue
+        if data not in sistema_por_data:
+            sistema_por_data[data] = []
+        sistema_por_data[data].append({
+            'id': row.get('id', ''),
+            'descricao': str(row.get('descricao', '')),
+            'valor': float(row.get('valor', 0) or 0),
+            'entrada': float(row.get('valor_entrada', 0) or 0),
+            'saida': float(row.get('valor_saida', 0) or 0),
+        })
+
+    todas_datas = sorted(set(list(banco_por_data.keys()) + list(sistema_por_data.keys())))
+
+    for data in todas_datas:
+        itens_banco   = banco_por_data.get(data, [])
+        itens_sistema = sistema_por_data.get(data, [])
+
+        # Tenta casar lançamentos por valor
+        sistema_usados = [False] * len(itens_sistema)
+
+        for item_b in itens_banco:
+            casado = False
+            for i, item_s in enumerate(itens_sistema):
+                if not sistema_usados[i] and abs(item_b['valor'] - item_s['valor']) < 0.05:
+                    # Encontrou par
+                    sistema_usados[i] = True
+                    casado = True
+                    status = "OK" if abs(item_b['entrada'] - item_s['entrada']) < 0.05 and                                      abs(item_b['saida'] - item_s['saida']) < 0.05 else "DIVERGENTE"
+                    registros.append({
+                        "id": item_b['id'],
+                        "descricao": item_b['descricao'] or item_s['descricao'],
+                        "valor_banco":   item_b['valor'],
+                        "valor_sistema": item_s['valor'],
+                        "status": status
+                    })
+                    break
+            if not casado:
+                registros.append({
+                    "id": item_b['id'],
+                    "descricao": item_b['descricao'],
+                    "valor_banco":   item_b['valor'],
+                    "valor_sistema": None,
+                    "status": "APENAS_BANCO"
+                })
+
+        # Itens do sistema sem par
+        for i, item_s in enumerate(itens_sistema):
+            if not sistema_usados[i]:
+                registros.append({
+                    "id": item_s['id'],
+                    "descricao": item_s['descricao'],
+                    "valor_banco":   None,
+                    "valor_sistema": item_s['valor'],
+                    "status": "APENAS_SISTEMA"
+                })
+
     return registros
 
 # ---------------------------------------------------------------------------
