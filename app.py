@@ -9,7 +9,7 @@ from datetime import datetime
 from pathlib import Path
 from flask import Flask, request, jsonify, render_template, session
 from werkzeug.utils import secure_filename
-import anthropic
+from groq import Groq
 
 logging.basicConfig(
     filename="motor_mineirinho.log",
@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 
 PASTA_UPLOADS    = Path("./uploads")
 PASTA_RELATORIOS = Path("./relatorios_triade")
-DB_PATH = Path("motor_seguro_v2.db")
+DB_PATH          = Path("motor_seguro.db")
 EXTENSOES_VALIDAS = {"csv", "xlsx", "xls", "pdf"}
 
 for pasta in [PASTA_UPLOADS, PASTA_RELATORIOS]:
@@ -211,12 +211,13 @@ Divergências:
 
 Seja claro e objetivo. Responda em português."""
     try:
-        cliente = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY",""))
-        r = cliente.messages.create(
-            model="claude-sonnet-4-20250514", max_tokens=1000,
+        cliente = Groq(api_key=os.environ.get("GROQ_API_KEY",""))
+        r = cliente.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            max_tokens=1000,
             messages=[{"role":"user","content":prompt}]
         )
-        return r.content[0].text
+        return r.choices[0].message.content
     except Exception as e:
         log.error("Erro IA: %s", e)
         return f"Análise IA indisponível: {e}"
