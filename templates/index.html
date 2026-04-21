@@ -238,7 +238,7 @@
     </div>
     <div style="overflow-x:auto;margin-top:16px;">
       <table class="reconcile-table">
-        <thead><tr><th>ID</th><th class="col-value">Valor Banco</th><th class="col-value">Valor Sistema</th><th class="col-status">Status</th></tr></thead>
+        <thead><tr><th>ID / Data</th><th>Descrição</th><th class="col-value">Valor Banco</th><th class="col-value">Valor Sistema</th><th class="col-status">Status</th></tr></thead>
         <tbody id="modal-resultado-body"></tbody>
       </table>
     </div>
@@ -321,6 +321,7 @@ document.getElementById("btn-login").addEventListener("click", fazerLogin);
 document.getElementById("input-senha").addEventListener("keydown", e => { if(e.key==="Enter") fazerLogin(); });
 
 async function fazerLogin() {
+  console.log('[BF] Iniciando login...');
   const usuario = document.getElementById("input-usuario").value.trim();
   const senha   = document.getElementById("input-senha").value;
   const erroEl  = document.getElementById("erro-login");
@@ -514,6 +515,7 @@ document.getElementById("btn-fechar-usuario").addEventListener("click",()=>{ doc
 document.getElementById("btn-cancelar-usuario").addEventListener("click",()=>{ document.getElementById("modal-usuario-overlay").style.display="none"; });
 
 document.getElementById("btn-salvar-usuario").addEventListener("click", async ()=>{
+  console.log('[BF] Salvando usuario...');
   const nome  = document.getElementById("input-novo-nome").value.trim();
   const senha = document.getElementById("input-novo-senha").value.trim();
   const papel = state.papel==="admin" ? document.getElementById("select-papel").value : "funcionario";
@@ -576,6 +578,7 @@ document.getElementById("btn-cancelar-lote").addEventListener("click", fecharMod
 document.getElementById("btn-cancelar-lote2").addEventListener("click", fecharModal);
 
 function abrirModalLote(){
+  console.log('[BF] Abrindo modal lote...');
   state.loteAtualId = null; state.condominiosModal = [];
   document.getElementById("input-nome-lote").value = "";
   document.getElementById("condominios-lista-modal").innerHTML = "";
@@ -586,6 +589,7 @@ function abrirModalLote(){
 function fecharModal(){ document.getElementById("modal-overlay").style.display="none"; carregarTudo(); }
 
 document.getElementById("btn-criar-lote").addEventListener("click", async ()=>{
+  console.log('[BF] Criando lote...');
   const nome = document.getElementById("input-nome-lote").value.trim();
   if(!nome){ mostrarToast("Digite o nome do lote.","error"); return; }
   const res   = await fetch("/api/lotes",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({nome})});
