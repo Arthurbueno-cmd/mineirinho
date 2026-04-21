@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 
 PASTA_UPLOADS    = Path("./uploads")
 PASTA_RELATORIOS = Path("./relatorios_triade")
-DB_PATH          = Path("motor_seguro.db")
+DB_PATH = Path("motor_seguro_v3.db")
 EXTENSOES_VALIDAS = {"csv", "xlsx", "xls", "pdf"}
 
 for pasta in [PASTA_UPLOADS, PASTA_RELATORIOS]:
